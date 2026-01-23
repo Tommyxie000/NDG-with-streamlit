@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工具库 - 6 Sigma质量管理学习平台</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/tools.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>6 Sigma质量管理学习平台</h1>
+                <p>工具库</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../index.html">首页</a></li>
+                    <li><a href="index.html" class="active">工具库</a></li>
+                    <li><a href="../videos/index.html">视频教程</a></li>
+                    <li><a href="../cases/index.html">培训案例</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="search-section">
+            <h2>工具搜索</h2>
+            <input type="text" id="search-input" placeholder="搜索工具名称、关键词..." class="search-input">
+            <div class="filter-tags">
+                <span class="filter-tag active" data-phase="all">全部</span>
+                <span class="filter-tag" data-phase="define">定义阶段</span>
+                <span class="filter-tag" data-phase="measure">测量阶段</span>
+                <span class="filter-tag" data-phase="analyze">分析阶段</span>
+                <span class="filter-tag" data-phase="improve">改进阶段</span>
+                <span class="filter-tag" data-phase="control">控制阶段</span>
+            </div>
+        </section>
+
+        <section class="tools-grid">
+            <div class="phase-section">
+                <h3>定义阶段 (Define)</h3>
+                <div class="tools-list">
+                    <div class="tool-item" data-phase="define">
+                        <div class="tool-icon">📋</div>
+                        <div class="tool-info">
+                            <h4>SIPOC分析</h4>
+                            <p>供应商、输入、过程、输出、客户分析</p>
+                            <span class="tool-difficulty">难度：⭐⭐</span>
+                        </div>
+                        <a href="define/sipoc.html" class="btn btn-small">查看工具</a>
+                    </div>
+                    <div class="tool-item" data-phase="define">
+                        <div class="tool-icon">🎯</div>
+                        <div class="tool-info">
+                            <h4>CTQ树</h4>
+                            <p>关键质量特性分解树</p>
+                            <span class="tool-difficulty">难度：⭐⭐</span>
+                        </div>
+                        <a href="define/ctq.html" class="btn btn-small">查看工具</a>
+                    </div>
+                    <div class="tool-item" data-phase="define">
+                        <div class="tool-icon">🗣</div>
+                        <div class="tool-info">
+                            <h4>VOC收集</h4>
+                            <p>客户声音收集方法</p>
+                            <span class="tool-difficulty">难度：⭐⭐⭐</span>
+                        </div>
+                        <a href="define/voc.html" class="btn btn-small">查看工具</a>
+                    </div>
+                    <div class="tool-item" data-phase="define">
+                        <div class="tool-icon">🔄</div>
+                        <div class="tool-info">
+                            <h4>流程图</h4>
+                            <p>流程可视化分析</p>
+                            <span class="tool-difficulty">难度：⭐⭐</span>
+                        </div>
+                        <a href="define/flowchart.html" class="btn btn-small">查看工具</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="phase-section">
+                <h3>测量阶段 (Measure)</h3>
+                <div class="tools-list">
+                    <div class="tool-item" data-phase="measure">
+                        <div class="tool-icon">📊</div>
+                        <div class="tool-info">
+                            <h4>MSA分析</h4>
+                            <p>测量系统分析，评估GR&R</p>
+                            <span class="tool-difficulty">难度：⭐⭐⭐⭐</span>
+                        </div>
+                        <a href="measure/msa.html" class="btn btn-small">查看工具</a>
+                    </div>
+                    <div class="tool-item" data-phase="measure">
+                        <div class="tool-icon">📈</div>
+                        <div class="tool-info">
+                            <h4>过程能力分析</h4>
+                            <p>计算Cp、Cpk等过程能力指数</p>
+                            <span class="tool-difficulty">难度：⭐⭐⭐</span>
+                        </div>
+                        <a href="measure/process-capability.html" class="btn btn-small">查看工具</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="phase-section">
+                <h3>分析阶段 (Analyze)</h3>
+                <div class="tools-list">
+                    <div class="tool-item" data-phase="analyze">
+                        <div class="tool-icon">🔬</div>
+                        <div class="tool-info">
+                            <h4>假设检验</h4>
+                            <p>t检验、卡方检验等统计方法</p>
+                            <span class="tool-difficulty">难度：⭐⭐⭐⭐</span>
+                        </div>
+                        <a href="analyze/hypothesis-test.html" class="btn btn-small">查看工具</a>
+                    </div>
+                    <div class="tool-item" data-phase="analyze">
+                        <div class="tool-icon">📉</div>
+                        <div class="tool-info">
+                            <h4>回归分析</h4>
+                            <p>线性回归、相关性分析</p>
+                            <span class="tool-difficulty">难度：⭐⭐⭐⭐</span>
+                        </div>
+                        <a href="analyze/regression.html" class="btn btn-small">查看工具</a>
+                    </div>
+                    <div class="tool-item" data-phase="analyze">
+                        <div class="tool-icon">📊</div>
+                        <div class="tool-info">
+                            <h4>方差分析 (ANOVA)</h4>
+                            <p>单因素、双因素ANOVA</p>
+                            <span class="tool-difficulty">难度：⭐⭐⭐⭐</span>
+                        </div>
+                        <a href="analyze/anova.html" class="btn btn-small">查看工具</a>
+                    </div>
+                    <div class="tool-item" data-phase="analyze">
+                        <div class="tool-icon">⚠️</div>
+                        <div class="tool-info">
+                            <h4>FMEA</h4>
+                            <p>失效模式与影响分析</p>
+                            <span class="tool-difficulty">难度：⭐⭐⭐</span>
+                        </div>
+                        <a href="analyze/fmea.html" class="btn btn-small">查看工具</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="phase-section">
+                <h3>改进阶段 (Improve)</h3>
+                <div class="tools-list">
+                    <div class="tool-item" data-phase="improve">
+                        <div class="tool-icon">🔬</div>
+                        <div class="tool-info">
+                            <h4>DOE实验设计</h4>
+                            <p>全因子、部分因子实验设计</p>
+                            <span class="tool-difficulty">难度：⭐⭐⭐⭐</span>
+                        </div>
+                        <a href="improve/doe.html" class="btn btn-small">查看工具</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="phase-section">
+                <h3>控制阶段 (Control)</h3>
+                <div class="tools-list">
+                    <div class="tool-item" data-phase="control">
+                        <div class="tool-icon">📊</div>
+                        <div class="tool-info">
+                            <h4>SPC控制图</h4>
+                            <p>Xbar-R、P图、U图等控制图</p>
+                            <span class="tool-difficulty">难度：⭐⭐⭐⭐</span>
+                        </div>
+                        <a href="control/spc.html" class="btn btn-small">查看工具</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 6 Sigma质量管理学习平台. 专注于数据处理和工具应用</p>
+        </div>
+    </footer>
+
+    <script src="../js/tools.js"></script>
+</body>
+</html>

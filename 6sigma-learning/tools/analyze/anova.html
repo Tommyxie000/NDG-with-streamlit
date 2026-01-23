@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>方差分析ANOVA - 6 Sigma质量管理学习平台</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tools.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>6 Sigma质量管理学习平台</h1>
+                <p>方差分析ANOVA</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../../index.html">首页</a></li>
+                    <li><a href="../index.html" class="active">工具库</a></li>
+                    <li><a href="../../videos/index.html">视频教程</a></li>
+                    <li><a href="../../cases/index.html">培训案例</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="tool-intro">
+            <h2>方差分析ANOVA (Analysis of Variance)</h2>
+            <p>方差分析是6 Sigma分析阶段的核心工具，用于比较多于两组数据的平均值是否显著不同。通过分析组间变异与组内变异的比值，可以确定观察到的差异是否由真实差异引起，还是仅由随机变异产生。</p>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <h4>应用场景</h4>
+                    <ul>
+                        <li>比较多于两组数据的均值</li>
+                        <li>分析因素对响应变量的影响</li>
+                        <li>评估不同处理或方法的差异</li>
+                        <li>实验设计中的数据分析</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>常见类型</h4>
+                    <ul>
+                        <li><strong>单向ANOVA</strong>：一个因素，多个水平</li>
+                        <li><strong>双向ANOVA</strong>：两个因素，多个水平</li>
+                        <li><strong>重复测量ANOVA</strong>：同一受试者多次测量</li>
+                        <li><strong>多因素ANOVA</strong>：多个因素的综合影响</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>关键概念</h4>
+                    <ul>
+                        <li><strong>组间变异</strong>：组间均值的差异程度</li>
+                        <li><strong>组内变异</strong>：组内数据的变异程度</li>
+                        <li><strong>F统计量</strong>：组间变异与组内变异的比值</li>
+                        <li><strong>p值</strong>：拒绝零假设的证据强度</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-calculator">
+            <h3>方差分析工具</h3>
+            <div class="calculator-grid">
+                <div class="input-group">
+                    <label>分析类型：</label>
+                    <select id="anova-type">
+                        <option value="one-way">单向ANOVA</option>
+                        <option value="two-way">双向ANOVA</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>显著性水平（α）：</label>
+                    <input type="number" id="alpha" value="0.05" step="0.01" min="0.001" max="0.5">
+                </div>
+                <div class="input-group">
+                    <label>数据输入：</label>
+                    <textarea id="data-input" rows="10" placeholder="按格式输入数据：
+单向ANOVA：
+组1,值1,值2,值3,...
+组2,值1,值2,值3,...
+组3,值1,值2,值3,...
+
+双向ANOVA：
+因素A,因素B,值
+A1,B1,值
+A1,B2,值
+..."></textarea>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="performANOVA()" class="btn btn-primary">进行ANOVA分析</button>
+                <button onclick="loadSampleData()" class="btn btn-secondary">加载示例数据</button>
+                <button onclick="clearInputs()" class="btn btn-secondary">清空输入</button>
+                <button onclick="exportResults()" class="btn btn-success">导出结果</button>
+            </div>
+        </section>
+
+        <section class="results-section" id="results-section" style="display: none;">
+            <h3>ANOVA分析结果</h3>
+            <div class="results-grid">
+                <div class="result-card">
+                    <h4>分析信息</h4>
+                    <div class="result-item">
+                        <span>分析类型：</span>
+                        <strong id="result-analysis-type">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>样本组数：</span>
+                        <strong id="result-group-count">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>总样本数：</span>
+                        <strong id="result-total-sample">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>显著性水平 (α)：</span>
+                        <strong id="result-alpha">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>ANOVA表</h4>
+                    <div class="result-item">
+                        <span>因素A F值：</span>
+                        <strong id="result-factor-a-f">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>因素A p值：</span>
+                        <strong id="result-factor-a-p">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>因素B F值：</span>
+                        <strong id="result-factor-b-f">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>因素B p值：</span>
+                        <strong id="result-factor-b-p">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>组间差异</h4>
+                    <div class="result-item">
+                        <span>F统计量：</span>
+                        <strong id="result-f-statistic">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>p值：</span>
+                        <strong id="result-p-value">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>显著性：</span>
+                        <strong id="result-significance">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>效应大小 (η²)：</span>
+                        <strong id="result-effect-size">-</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h4>数据分布图</h4>
+                <div style="height: 400px; margin: 20px 0;">
+                    <canvas id="data-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h4>组间均值比较</h4>
+                <div style="height: 400px; margin: 20px 0;">
+                    <canvas id="mean-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="table-section">
+                <h4>详细统计信息</h4>
+                <div class="table-container">
+                    <table id="stats-table" class="data-table">
+                        <thead id="stats-table-head">
+                            <!-- 动态内容 -->
+                        </thead>
+                        <tbody id="stats-table-body">
+                            <!-- 动态内容 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="table-section">
+                <h4>ANOVA表</h4>
+                <div class="table-container">
+                    <table id="anova-table" class="data-table">
+                        <thead id="anova-table-head">
+                            <tr>
+                                <th>变异来源</th>
+                                <th>平方和</th>
+                                <th>自由度</th>
+                                <th>均方</th>
+                                <th>F值</th>
+                                <th>p值</th>
+                            </tr>
+                        </thead>
+                        <tbody id="anova-table-body">
+                            <!-- 动态内容 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-steps">
+            <h3>操作步骤</h3>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>确定研究问题</h4>
+                        <p>明确要比较的组数和每组的数据。确定是否有多个因素需要分析，以及它们是独立的还是有交互作用。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>选择ANOVA类型</h4>
+                        <p>根据研究设计选择适当的ANOVA类型：单向ANOVA用于比较多个组的均值，双向ANOVA用于分析两个因素及其交互作用。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>收集和整理数据</h4>
+                        <p>收集各组的数据，确保数据格式正确且完整。确保各组数据相互独立，组内数据呈正态分布且方差齐性。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>进行ANOVA分析</h4>
+                        <p>计算各组的均值、组间平方和、组内平方和和总平方和。计算F统计量及其对应的p值。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>解释结果</h4>
+                        <p>比较p值与显著性水平（通常α=0.05），判断是否拒绝零假设。如果拒绝，说明至少有一组均值显著不同。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>进行事后检验</h4>
+                        <p>如果ANOVA结果显著，进行事后检验（如Tukey HSD）确定哪些组之间存在显著差异。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-notes">
+            <h3>注意事项</h3>
+            <div class="notes-list">
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>正态性假设</strong>：ANOVA假设每组数据都呈正态分布。如果数据明显不符合正态分布，考虑进行数据转换或使用非参数方法。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>方差齐性</strong>：ANOVA假设各组方差相等（方差齐性）。如果违反此假设，考虑使用Welch ANOVA或其他方法。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>独立性</strong>：观测值应相互独立。违反此假设会影响结果的可靠性。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>事后检验</strong>：当ANOVA结果显著时，需要进行事后检验确定具体哪些组之间存在显著差异。常见的检验方法有Tukey HSD、Bonferroni和Scheffe。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">💡</span>
+                    <p><strong>效应大小</strong>：除了p值，还应关注效应大小，如η²（eta squared），它表示因素解释的变异比例。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="related-tools">
+            <h3>相关工具</h3>
+            <div class="related-grid">
+                <div class="related-item">
+                    <h4>假设检验</h4>
+                    <p>比较两组数据的均值差异</p>
+                    <a href="hypothesis-test.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>MSA分析</h4>
+                    <p>评估测量系统是否准确可靠</p>
+                    <a href="../measure/msa.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>回归分析</h4>
+                    <p>分析变量之间的关系</p>
+                    <a href="regression.html" class="btn btn-small">查看工具</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-recommendations">
+            <h3>推荐视频教程</h3>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>方差分析基础</h4>
+                        <p>YouTube - Six Sigma Institute</p>
+                        <span class="video-duration">18分钟</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=example1" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>双向ANOVA实战</h4>
+                        <p>B站 - 质量管理学习</p>
+                        <span class="video-duration">22分钟</span>
+                    </div>
+                    <a href="https://www.bilibili.com/video/BV1example" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 6 Sigma质量管理学习平台. 专注于数据处理和工具应用</p>
+        </div>
+    </footer>
+
+    <script src="../../js/tools.js"></script>
+    <script>
+        let dataChart = null;
+        let meanChart = null;
+
+        // 加载示例数据
+        function loadSampleData() {
+            const anovaType = document.getElementById('anova-type').value;
+            let sampleData = '';
+            
+            if (anovaType === 'one-way') {
+                sampleData = `组1,10.5,10.8,10.3,10.7,10.6
+组2,11.2,11.5,11.1,11.3,11.4
+组3,12.0,12.3,12.1,12.5,12.2`;
+            } else if (anovaType === 'two-way') {
+                sampleData = `因素A,因素B,值
+A1,B1,10.5
+A1,B1,10.8
+A1,B2,11.2
+A1,B2,11.5
+A2,B1,11.1
+A2,B1,11.3
+A2,B2,12.0
+A2,B2,12.3
+A3,B1,12.1
+A3,B1,12.5
+A3,B2,13.0
+A3,B2,13.3`;
+            }
+            
+            document.getElementById('data-input').value = sampleData;
+        }
+
+        // 执行ANOVA分析
+        function performANOVA() {
+            const anovaType = document.getElementById('anova-type').value;
+            const alpha = parseFloat(document.getElementById('alpha').value);
+            const dataText = document.getElementById('data-input').value.trim();
+            
+            // 验证输入
+            if (!dataText) {
+                alert('请输入数据');
+                return;
+            }
+            
+            // 解析数据
+            let results;
+            if (anovaType === 'one-way') {
+                results = performOneWayANOVA(dataText, alpha);
+            } else if (anovaType === 'two-way') {
+                results = performTwoWayANOVA(dataText, alpha);
+            }
+            
+            if (!results) {
+                alert('数据格式错误，请检查输入');
+                return;
+            }
+            
+            // 显示结果
+            displayResults(results, anovaType);
+            
+            // 显示结果部分
+            document.getElementById('results-section').style.display = 'block';
+            
+            // 绘制图表
+            drawDataChart(results);
+            drawMeanChart(results);
+            
+            // 显示统计表
+            updateStatsTable(results);
+            
+            // 显示ANOVA表
+            updateAnovaTable(results);
+        }
+
+        // 单向ANOVA分析
+        function performOneWayANOVA(dataText, alpha) {
+            const lines = dataText.split('\n').filter(line => line.trim() !== '');
+            
+            if (lines.length < 2) {
+                alert('至少需要两组数据');
+                return null;
+            }
+            
+            // 解析数据
+            const groups = [];
+            const allValues = [];
+            let groupNames = [];
+            
+            lines.forEach(line => {
+                const parts = line.split(',');
+                if (parts.length >= 2) {
+                    const groupName = parts[0].trim();
+                    const values = parts.slice(1).map(p => parseFloat(p.trim())).filter(v => !isNaN(v));
+                    
+                    if (values.length > 0) {
+                        groups.push({
+                            name: groupName,
+                            values: values
+                        });
+                        
+                        // 收集所有值用于后续计算
+                        allValues.push(...values);
+                        
+                        // 如果是第一次添加组名
+                        if (groupNames.length === 0) {
+                            groupNames.push(groupName);
+                        } else if (!groupNames.includes(groupName)) {
+                            groupNames.push(groupName);
+                        }
+                    }
+                }
+            });
+            
+            if (groups.length < 2) {
+                alert('至少需要两组有效数据');
+                return null;
+            }
+            
+            // 计算统计量
+            const n = allValues.length;
+            const grandMean = allValues.reduce((sum, val) => sum + val, 0) / n;
+            
+            // 计算组统计量
+            const groupStats = groups.map(group => {
+                const groupMean = group.values.reduce((sum, val) => sum + val, 0) / group.values.length;
+                const groupSumSquares = group.values.reduce((sum, val) => sum + Math.pow(val - groupMean, 2), 0);
+                
+                return {
+                    name: group.name,
+                    count: group.values.length,
+                    mean: groupMean,
+                    sumSquares: groupSumSquares
+                };
+            });
+            
+            // 计算总平方和
+            const totalSumSquares = allValues.reduce((sum, val) => sum + Math.pow(val - grandMean, 2), 0);
+            
+            // 计算组间平方和
+            let betweenGroupSumSquares = 0;
+            groupStats.forEach(stat => {
+                betweenGroupSumSquares += stat.count * Math.pow(stat.mean - grandMean, 2);
+            });
+            
+            // 计算组内平方和
+            let withinGroupSumSquares = 0;
+            groups.forEach((group, i) => {
+                const groupMean = groupStats[i].mean;
+                group.values.forEach(val => {
+                    withinGroupSumSquares += Math.pow(val - groupMean, 2);
+                });
+            });
+            
+            // 计算自由度
+            const dfBetween = groups.length - 1;
+            const dfWithin = n - groups.length;
+            const dfTotal = n - 1;
+            
+            // 计算均方
+            const msBetween = betweenGroupSumSquares / dfBetween;
+            const msWithin = withinGroupSumSquares / dfWithin;
+            
+            // 计算F统计量
+            const fStatistic = msBetween / msWithin;
+            
+            // 计算p值
+            const pValue = calculatePValueFromF(fStatistic, dfBetween, dfWithin);
+            
+            // 计算效应大小（eta squared）
+            const etaSquared = betweenGroupSumSquares / totalSumSquares;
+            
+            // 判断显著性
+            const isSignificant = pValue < alpha;
+            
+            return {
+                type: 'one-way',
+                groupStats: groupStats,
+                totalMean: grandMean,
+                totalSumSquares: totalSumSquares,
+                betweenGroupSumSquares: betweenGroupSumSquares,
+                withinGroupSumSquares: withinGroupSumSquares,
+                dfBetween: dfBetween,
+                dfWithin: dfWithin,
+                dfTotal: dfTotal,
+                msBetween: msBetween,
+                msWithin: msWithin,
+                fStatistic: fStatistic,
+                pValue: pValue,
+                alpha: alpha,
+                isSignificant: isSignificant,
+                etaSquared: etaSquared
+            };
+        }
+
+        // 双向ANOVA分析
+        function performTwoWayANOVA(dataText, alpha) {
+            const lines = dataText.split('\n').filter(line => line.trim() !== '');
+            
+            if (lines.length < 2) {
+                alert('至少需要一行数据');
+                return null;
+            }
+            
+            // 解析数据
+            const data = [];
+            let factorALevels = new Set();
+            let factorBLevels = new Set();
+            
+            lines.forEach(line => {
+                const parts = line.split(',');
+                if (parts.length >= 3) {
+                    const factorA = parts[0].trim();
+                    const factorB = parts[1].trim();
+                    const value = parseFloat(parts[2].trim());
+                    
+                    if (!isNaN(value)) {
+                        data.push({
+                            factorA: factorA,
+                            factorB: factorB,
+                            value: value
+                        });
+                        
+                        factorALevels.add(factorA);
+                        factorBLevels.add(factorB);
+                    }
+                }
+            });
+            
+            if (data.length === 0) {
+                alert('没有有效数据');
+                return null;
+            }
+            
+            // 获取因子水平
+            const factorAList = Array.from(factorALevels);
+            const factorBList = Array.from(factorBLevels);
+            
+            // 计算因子A的平均值
+            const factorAStats = factorAList.map(level => {
+                const values = data.filter(d => d.factorA === level).map(d => d.value);
+                const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+                return {
+                    level: level,
+                    count: values.length,
+                    mean: mean
+                };
+            });
+            
+            // 计算因子B的平均值
+            const factorBStats = factorBList.map(level => {
+                const values = data.filter(d => d.factorB === level).map(d => d.value);
+                const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+                return {
+                    level: level,
+                    count: values.length,
+                    mean: mean
+                };
+            });
+            
+            // 计算总体统计量
+            const allValues = data.map(d => d.value);
+            const n = allValues.length;
+            const grandMean = allValues.reduce((sum, val) => sum + val, 0) / n;
+            
+            // 计算单元格的平均值和计数
+            const cellStats = {};
+            data.forEach(d => {
+                const key = `${d.factorA}-${d.factorB}`;
+                if (!cellStats[key]) {
+                    cellStats[key] = {
+                        factorA: d.factorA,
+                        factorB: d.factorB,
+                        values: [],
+                        count: 0,
+                        mean: 0
+                    };
+                }
+                cellStats[key].values.push(d.value);
+                cellStats[key].count++;
+            });
+            
+            // 计算单元格均值
+            Object.values(cellStats).forEach(cell => {
+                cell.mean = cell.values.reduce((sum, val) => sum + val, 0) / cell.values.length;
+            });
+            
+            // 计算平方和
+            const totalSumSquares = allValues.reduce((sum, val) => sum + Math.pow(val - grandMean, 2), 0);
+            
+            // 因子A平方和
+            let sumSquaresA = 0;
+            factorAStats.forEach(stat => {
+                sumSquaresA += stat.count * Math.pow(stat.mean - grandMean, 2);
+            });
+            
+            // 因子B平方和
+            let sumSquaresB = 0;
+            factorBStats.forEach(stat => {
+                sumSquaresB += stat.count * Math.pow(stat.mean - grandMean, 2);
+            });
+            
+            // 交互作用平方和
+            let sumSquaresAB = 0;
+            Object.values(cellStats).forEach(cell => {
+                const factorAMean = factorAStats.find(s => s.level === cell.factorA).mean;
+                const factorBMean = factorBStats.find(s => s.level === cell.factorB).mean;
+                const expected = grandMean + (factorAMean - grandMean) + (factorBMean - grandMean);
+                sumSquaresAB += cell.count * Math.pow(cell.mean - expected, 2);
+            });
+            
+            // 误差平方和
+            const sumSquaresError = totalSumSquares - sumSquaresA - sumSquaresB - sumSquaresAB;
+            
+            // 计算自由度
+            const dfA = factorAList.length - 1;
+            const dfB = factorBList.length - 1;
+            const dfAB = dfA * dfB;
+            const dfError = n - factorAList.length * factorBList.length;
+            
+            // 计算均方
+            const msA = sumSquaresA / dfA;
+            const msB = sumSquaresB / dfB;
+            const msAB = sumSquaresAB / dfAB;
+            const msError = sumSquaresError / dfError;
+            
+            // 计算F统计量
+            const fA = msA / msError;
+            const fB = msB / msError;
+            const fAB = msAB / msError;
+            
+            // 计算p值
+            const pA = calculatePValueFromF(fA, dfA, dfError);
+            const pB = calculatePValueFromF(fB, dfB, dfError);
+            const pAB = calculatePValueFromF(fAB, dfAB, dfError);
+            
+            // 计算效应大小
+            const etaSquaredA = sumSquaresA / totalSumSquares;
+            const etaSquaredB = sumSquaresB / totalSumSquares;
+            const etaSquaredAB = sumSquaresAB / totalSumSquares;
+            
+            // 判断显著性
+            const isSignificantA = pA < alpha;
+            const isSignificantB = pB < alpha;
+            const isSignificantAB = pAB < alpha;
+            
+            return {
+                type: 'two-way',
+                factorALevels: factorAList,
+                factorBLevels: factorBList,
+                factorAStats: factorAStats,
+                factorBStats: factorBStats,
+                cellStats: Object.values(cellStats),
+                totalMean: grandMean,
+                totalSumSquares: totalSumSquares,
+                sumSquaresA: sumSquaresA,
+                sumSquaresB: sumSquaresB,
+                sumSquaresAB: sumSquaresAB,
+                sumSquaresError: sumSquaresError,
+                dfA: dfA,
+                dfB: dfB,
+                dfAB: dfAB,
+                dfError: dfError,
+                msA: msA,
+                msB: msB,
+                msAB: msAB,
+                msError: msError,
+                fA: fA,
+                fB: fB,
+                fAB: fAB,
+                pA: pA,
+                pB: pB,
+                pAB: pAB,
+                alpha: alpha,
+                isSignificantA: isSignificantA,
+                isSignificantB: isSignificantB,
+                isSignificantAB: isSignificantAB,
+                etaSquaredA: etaSquaredA,
+                etaSquaredB: etaSquaredB,
+                etaSquaredAB: etaSquaredAB
+            };
+        }
+
+        // 计算F分布的p值
+        function calculatePValueFromF(f, df1, df2) {
+            // 简化的F分布p值计算
+            // 实际应用应使用更精确的方法
+            const x = (df1 * f) / (df1 * f + df2);
+            
+            // 使用Beta函数的近似
+            let p = 1;
+            let term = 1;
+            let i = 1;
+            
+            while (Math.abs(term) > 0.0001 && i < 1000) {
+                term *= x * (df2 + i - 1) / (df1 + i);
+                p -= term;
+                i++;
+            }
+            
+            return Math.max(0, Math.min(1, p));
+        }
+
+        // 显示结果
+        function displayResults(results, anovaType) {
+            // 显示分析信息
+            document.getElementById('result-analysis-type').textContent = anovaType === 'one-way' ? '单向ANOVA' : '双向ANOVA';
+            
+            if (anovaType === 'one-way') {
+                document.getElementById('result-group-count').textContent = results.groupStats.length;
+                document.getElementById('result-total-sample').textContent = results.groupStats.reduce((sum, stat) => sum + stat.count, 0);
+            } else {
+                document.getElementById('result-group-count').textContent = `${results.factorALevels.length} x ${results.factorBLevels.length}`;
+                document.getElementById('result-total-sample').textContent = results.cellStats.reduce((sum, stat) => sum + stat.count, 0);
+            }
+            
+            document.getElementById('result-alpha').textContent = results.alpha.toFixed(3);
+            
+            // 显示F统计量和p值
+            if (anovaType === 'one-way') {
+                document.getElementById('result-f-statistic').textContent = results.fStatistic.toFixed(4);
+                document.getElementById('result-p-value').textContent = results.pValue.toFixed(4);
+                document.getElementById('result-significance').textContent = results.isSignificant ? '显著' : '不显著';
+                document.getElementById('result-effect-size').textContent = results.etaSquared.toFixed(4);
+                
+                // 隐藏双向ANOVA相关元素
+                document.getElementById('result-factor-a-f').parentElement.style.display = 'none';
+                document.getElementById('result-factor-a-p').parentElement.style.display = 'none';
+                document.getElementById('result-factor-b-f').parentElement.style.display = 'none';
+                document.getElementById('result-factor-b-p').parentElement.style.display = 'none';
+            } else {
+                document.getElementById('result-factor-a-f').textContent = results.fA.toFixed(4);
+                document.getElementById('result-factor-a-p').textContent = results.pA.toFixed(4);
+                document.getElementById('result-factor-b-f').textContent = results.fB.toFixed(4);
+                document.getElementById('result-factor-b-p').textContent = results.pB.toFixed(4);
+                
+                // 隐藏单向ANOVA相关元素
+                document.getElementById('result-f-statistic').parentElement.style.display = 'none';
+                document.getElementById('result-p-value').parentElement.style.display = 'none';
+                document.getElementById('result-significance').parentElement.style.display = 'none';
+                document.getElementById('result-effect-size').parentElement.style.display = 'none';
+            }
+        }
+
+        // 绘制数据分布图
+        function drawDataChart(results) {
+            const ctx = document.getElementById('data-chart').getContext('2d');
+            
+            if (dataChart) {
+                dataChart.destroy();
+            }
+            
+            // 准备数据
+            let labels, datasets;
+            
+            if (results.type === 'one-way') {
+                // 单向ANOVA情况
+                labels = results.groupStats.map(stat => stat.name);
+                datasets = [{
+                    label: '组均值',
+                    data: results.groupStats.map(stat => stat.mean),
+                    backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }];
+            } else {
+                // 双向ANOVA情况
+                labels = results.factorALevels;
+                const datasets = results.factorBLevels.map((level, index) => {
+                    const colors = [
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 159, 64, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)'
+                    ];
+                    
+                    return {
+                        label: level,
+                        data: results.factorALevels.map(factorA => {
+                            const cell = results.cellStats.find(c => c.factorA === factorA && c.factorB === level);
+                            return cell ? cell.mean : 0;
+                        }),
+                        backgroundColor: colors[index % colors.length],
+                        borderColor: colors[index % colors.length].replace('0.8', '1'),
+                        borderWidth: 1
+                    };
+                });
+                
+                datasets = results.factorBLevels.map((level, index) => {
+                    const colors = [
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 159, 64, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)'
+                    ];
+                    
+                    return {
+                        label: level,
+                        data: results.factorALevels.map(factorA => {
+                            const cell = results.cellStats.find(c => c.factorA === factorA && c.factorB === level);
+                            return cell ? cell.mean : 0;
+                        }),
+                        backgroundColor: colors[index % colors.length],
+                        borderColor: colors[index % colors.length].replace('0.8', '1'),
+                        borderWidth: 1
+                    };
+                });
+            }
+            
+            dataChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                        title: {
+                            display: true,
+                            text: results.type === 'one-way' ? '各组均值' : '因子A与因子B交互作用'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // 绘制组间均值比较图
+        function drawMeanChart(results) {
+            const ctx = document.getElementById('mean-chart').getContext('2d');
+            
+            if (meanChart) {
+                meanChart.destroy();
+            }
+            
+            // 准备数据
+            let labels, datasets;
+            
+            if (results.type === 'one-way') {
+                // 单向ANOVA情况
+                labels = results.groupStats.map(stat => stat.name);
+                const standardErrors = results.groupStats.map(stat => {
+                    // 简化标准误差计算
+                    return Math.sqrt(results.withinGroupSumSquares / (results.dfWithin * stat.count));
+                });
+                
+                datasets = [{
+                    label: '均值 ± 标准误',
+                    data: results.groupStats.map((stat, i) => ({
+                        x: stat.name,
+                        y: stat.mean,
+                        error: standardErrors[i]
+                    })),
+                    backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }];
+            } else {
+                // 双向ANOVA情况
+                labels = results.factorALevels;
+                datasets = results.factorBLevels.map((level, index) => {
+                    const colors = [
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 159, 64, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)'
+                    ];
+                    
+                    return {
+                        label: level,
+                        data: results.factorALevels.map(factorA => {
+                            const cell = results.cellStats.find(c => c.factorA === factorA && c.factorB === level);
+                            return cell ? cell.mean : 0;
+                        }),
+                        backgroundColor: colors[index % colors.length],
+                        borderColor: colors[index % colors.length].replace('0.8', '1'),
+                        borderWidth: 1
+                    };
+                });
+            }
+            
+            meanChart = new Chart(ctx, {
+                type: results.type === 'one-way' ? 'bar' : 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                        title: {
+                            display: true,
+                            text: results.type === 'one-way' ? '各组均值比较' : '因子A与因子B的交互作用'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // 更新统计表
+        function updateStatsTable(results) {
+            const thead = document.getElementById('stats-table-head');
+            const tbody = document.getElementById('stats-table-body');
+            
+            // 清空表格
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+            
+            // 创建表头
+            const headerRow = document.createElement('tr');
+            const headers = ['组别', '样本数', '均值', '标准差'];
+            
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            
+            thead.appendChild(headerRow);
+            
+            // 添加数据行
+            if (results.type === 'one-way') {
+                results.groupStats.forEach(stat => {
+                    const tr = document.createElement('tr');
+                    
+                    // 计算标准差
+                    const group = document.getElementById('data-input').value.split('\n')
+                        .find(line => line.startsWith(stat.name))
+                        .split(',')
+                        .slice(1)
+                        .map(v => parseFloat(v.trim()))
+                        .filter(v => !isNaN(v));
+                    
+                    const mean = group.reduce((sum, val) => sum + val, 0) / group.length;
+                    const variance = group.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / (group.length - 1);
+                    const std = Math.sqrt(variance);
+                    
+                    const td1 = document.createElement('td');
+                    td1.textContent = stat.name;
+                    tr.appendChild(td1);
+                    
+                    const td2 = document.createElement('td');
+                    td2.textContent = stat.count;
+                    tr.appendChild(td2);
+                    
+                    const td3 = document.createElement('td');
+                    td3.textContent = stat.mean.toFixed(4);
+                    tr.appendChild(td3);
+                    
+                    const td4 = document.createElement('td');
+                    td4.textContent = std.toFixed(4);
+                    tr.appendChild(td4);
+                    
+                    tbody.appendChild(tr);
+                });
+            } else {
+                // 双向ANOVA的因子A统计
+                results.factorAStats.forEach(stat => {
+                    const tr = document.createElement('tr');
+                    
+                    const td1 = document.createElement('td');
+                    td1.textContent = `因子A-${stat.level}`;
+                    tr.appendChild(td1);
+                    
+                    const td2 = document.createElement('td');
+                    td2.textContent = stat.count;
+                    tr.appendChild(td2);
+                    
+                    const td3 = document.createElement('td');
+                    td3.textContent = stat.mean.toFixed(4);
+                    tr.appendChild(td3);
+                    
+                    // 标准差（简化计算）
+                    const td4 = document.createElement('td');
+                    td4.textContent = '-';
+                    tr.appendChild(td4);
+                    
+                    tbody.appendChild(tr);
+                });
+                
+                // 因子B统计
+                results.factorBStats.forEach(stat => {
+                    const tr = document.createElement('tr');
+                    
+                    const td1 = document.createElement('td');
+                    td1.textContent = `因子B-${stat.level}`;
+                    tr.appendChild(td1);
+                    
+                    const td2 = document.createElement('td');
+                    td2.textContent = stat.count;
+                    tr.appendChild(td2);
+                    
+                    const td3 = document.createElement('td');
+                    td3.textContent = stat.mean.toFixed(4);
+                    tr.appendChild(td3);
+                    
+                    // 标准差（简化计算）
+                    const td4 = document.createElement('td');
+                    td4.textContent = '-';
+                    tr.appendChild(td4);
+                    
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        // 更新ANOVA表
+        function updateAnovaTable(results) {
+            const tbody = document.getElementById('anova-table-body');
+            
+            // 清空表格
+            tbody.innerHTML = '';
+            
+            if (results.type === 'one-way') {
+                // 单向ANOVA表
+                const rows = [
+                    {
+                        source: '组间',
+                        sumSquares: results.betweenGroupSumSquares,
+                        df: results.dfBetween,
+                        ms: results.msBetween,
+                        f: results.fStatistic,
+                        p: results.pValue
+                    },
+                    {
+                        source: '组内',
+                        sumSquares: results.withinGroupSumSquares,
+                        df: results.dfWithin,
+                        ms: results.msWithin,
+                        f: '',
+                        p: ''
+                    },
+                    {
+                        source: '总计',
+                        sumSquares: results.totalSumSquares,
+                        df: results.dfTotal,
+                        ms: '',
+                        f: '',
+                        p: ''
+                    }
+                ];
+                
+                rows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    
+                    const td1 = document.createElement('td');
+                    td1.textContent = row.source;
+                    tr.appendChild(td1);
+                    
+                    const td2 = document.createElement('td');
+                    td2.textContent = row.sumSquares.toFixed(4);
+                    tr.appendChild(td2);
+                    
+                    const td3 = document.createElement('td');
+                    td3.textContent = row.df;
+                    tr.appendChild(td3);
+                    
+                    const td4 = document.createElement('td');
+                    td4.textContent = row.ms ? row.ms.toFixed(4) : '';
+                    tr.appendChild(td4);
+                    
+                    const td5 = document.createElement('td');
+                    td5.textContent = row.f ? row.f.toFixed(4) : '';
+                    tr.appendChild(td5);
+                    
+                    const td6 = document.createElement('td');
+                    td6.textContent = row.p ? row.p.toFixed(4) : '';
+                    tr.appendChild(td6);
+                    
+                    tbody.appendChild(tr);
+                });
+            } else {
+                // 双向ANOVA表
+                const rows = [
+                    {
+                        source: '因子A',
+                        sumSquares: results.sumSquaresA,
+                        df: results.dfA,
+                        ms: results.msA,
+                        f: results.fA,
+                        p: results.pA
+                    },
+                    {
+                        source: '因子B',
+                        sumSquares: results.sumSquaresB,
+                        df: results.dfB,
+                        ms: results.msB,
+                        f: results.fB,
+                        p: results.pB
+                    },
+                    {
+                        source: '交互作用',
+                        sumSquares: results.sumSquaresAB,
+                        df: results.dfAB,
+                        ms: results.msAB,
+                        f: results.fAB,
+                        p: results.pAB
+                    },
+                    {
+                        source: '误差',
+                        sumSquares: results.sumSquaresError,
+                        df: results.dfError,
+                        ms: results.msError,
+                        f: '',
+                        p: ''
+                    }
+                ];
+                
+                rows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    
+                    const td1 = document.createElement('td');
+                    td1.textContent = row.source;
+                    tr.appendChild(td1);
+                    
+                    const td2 = document.createElement('td');
+                    td2.textContent = row.sumSquares.toFixed(4);
+                    tr.appendChild(td2);
+                    
+                    const td3 = document.createElement('td');
+                    td3.textContent = row.df;
+                    tr.appendChild(td3);
+                    
+                    const td4 = document.createElement('td');
+                    td4.textContent = row.ms ? row.ms.toFixed(4) : '';
+                    tr.appendChild(td4);
+                    
+                    const td5 = document.createElement('td');
+                    td5.textContent = row.f ? row.f.toFixed(4) : '';
+                    tr.appendChild(td5);
+                    
+                    const td6 = document.createElement('td');
+                    td6.textContent = row.p ? row.p.toFixed(4) : '';
+                    tr.appendChild(td6);
+                    
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        // 清空输入
+        function clearInputs() {
+            document.getElementById('data-input').value = '';
+            document.getElementById('results-section').style.display = 'none';
+            if (dataChart) {
+                dataChart.destroy();
+                dataChart = null;
+            }
+            if (meanChart) {
+                meanChart.destroy();
+                meanChart = null;
+            }
+        }
+
+        // 导出结果
+        function exportResults() {
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection.style.display === 'none') {
+                alert('请先进行ANOVA分析');
+                return;
+            }
+
+            // 获取结果数据
+            const analysisType = document.getElementById('result-analysis-type').textContent;
+            const groupCount = document.getElementById('result-group-count').textContent;
+            const totalSample = document.getElementById('result-total-sample').textContent;
+            const alpha = document.getElementById('result-alpha').textContent;
+            
+            // 创建CSV内容
+            let csvContent = '指标,数值\n';
+            csvContent += `分析类型,${analysisType}\n`;
+            csvContent += `组数,${groupCount}\n`;
+            csvContent += `总样本数,${totalSample}\n`;
+            csvContent += `显著性水平,${alpha}\n\n`;
+            
+            // 添加统计表
+            csvContent += '统计信息,\n';
+            const tableBody = document.querySelectorAll('#stats-table-body tr');
+            tableBody.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 0) {
+                    csvContent += `${cells[0].textContent},${cells[1].textContent},${cells[2].textContent},${cells[3].textContent}\n`;
+                }
+            });
+            
+            // 添加ANOVA表
+            csvContent += '\nANOVA表,\n';
+            const anovaTableBody = document.querySelectorAll('#anova-table-body tr');
+            anovaTableBody.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 0) {
+                    csvContent += `${cells[0].textContent},${cells[1].textContent},${cells[2].textContent},${cells[3].textContent},${cells[4].textContent},${cells[5].textContent}\n`;
+                }
+            });
+
+            // 下载CSV文件
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '方差分析结果.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>

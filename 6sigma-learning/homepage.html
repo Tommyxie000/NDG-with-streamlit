@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6 Sigma质量管理学习平台</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>6 Sigma质量管理学习平台</h1>
+                <p>从零基础到专家的专业程度，掌握质量控制工具</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="homepage.html" class="active">首页</a></li>
+                    <li><a href="tools/index.html">工具库</a></li>
+                    <li><a href="videos/index.html">视频教程</a></li>
+                    <li><a href="cases/index.html">培训案例</a></li>
+                    <li><a href="learning/index.html">学习路径</a></li>
+                    <li><a href="resources/index.html">资源中心</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h2>欢迎来到6 Sigma质量管理学习平台</h2>
+            <p>专注于数据处理和工具应用，帮助质量管理人员系统学习和掌握6 Sigma方法论</p>
+            <div class="hero-buttons">
+                <a href="tools/index.html" class="btn btn-primary">开始学习工具</a>
+                <a href="videos/index.html" class="btn btn-secondary">观看视频教程</a>
+            </div>
+        </section>
+
+        <section class="features">
+            <h3>核心功能模块</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🛠️</div>
+                    <h4>工具库</h4>
+                    <p>23个核心工具的交互演示，涵盖DMAIC全流程</p>
+                    <a href="tools/index.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎥</div>
+                    <h4>视频教程</h4>
+                    <p>YouTube和哔哩哔哩优质教学内容，系统化学习路径</p>
+                    <a href="videos/index.html" class="btn btn-small">观看视频</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h4>培训案例</h4>
+                    <p>制造业、服务业实战案例，完整DMAIC过程</p>
+                    <a href="cases/index.html" class="btn btn-small">学习案例</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h4>学习路径</h4>
+                    <p>黄带、绿带、黑带课程规划，跟踪学习进度</p>
+                    <a href="learning/index.html" class="btn btn-small">规划学习</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h4>资源中心</h4>
+                    <p>丰富的学习资料、模板下载、参考书籍</p>
+                    <a href="resources/index.html" class="btn btn-small">浏览资源</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="dmaic">
+            <h3>DMAIC方法论</h3>
+            <div class="dmaic-steps">
+                <div class="dmaic-step">
+                    <div class="step-number">D</div>
+                    <h4>定义 (Define)</h4>
+                    <p>明确项目目标、范围和客户需求</p>
+                    <ul>
+                        <li>SIPOC分析</li>
+                        <li>CTQ树</li>
+                        <li>项目章程</li>
+                        <li>VOC收集</li>
+                    </ul>
+                </div>
+                <div class="dmaic-step">
+                    <div class="step-number">M</div>
+                    <h4>测量 (Measure)</h4>
+                    <p>建立测量系统，收集基线数据</p>
+                    <ul>
+                        <li>MSA分析</li>
+                        <li>过程能力分析</li>
+                        <li>数据收集计划</li>
+                    </ul>
+                </div>
+                <div class="dmaic-step">
+                    <div class="step-number">A</div>
+                    <h4>分析 (Analyze)</h4>
+                    <p>识别根本原因，验证假设</p>
+                    <ul>
+                        <li>假设检验</li>
+                        <li>回归分析</li>
+                        <li>ANOVA</li>
+                        <li>FMEA</li>
+                    </ul>
+                </div>
+                <div class="dmaic-step">
+                    <div class="step-number">I</div>
+                    <h4>改进 (Improve)</h4>
+                    <p>制定并实施改进方案</p>
+                    <ul>
+                        <li>DOE实验设计</li>
+                        <li>精益工具</li>
+                        <li>防错设计</li>
+                    </ul>
+                </div>
+                <div class="dmaic-step">
+                    <div class="step-number">C</div>
+                    <h4>控制 (Control)</h4>
+                    <p>建立控制计划，维持改进成果</p>
+                    <ul>
+                        <li>SPC控制图</li>
+                        <li>控制计划</li>
+                        <li>标准化</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="quick-tools">
+            <h3>热门工具</h3>
+            <div class="tool-cards">
+                <div class="tool-card">
+                    <h4>过程能力分析</h4>
+                    <p>计算Cp、Cpk等过程能力指标</p>
+                    <a href="tools/measure/process-capability.html" class="btn btn-small">使用工具</a>
+                </div>
+                <div class="tool-card">
+                    <h4>MSA分析</h4>
+                    <p>测量系统分析，评估GR&R</p>
+                    <a href="tools/measure/msa.html" class="btn btn-small">使用工具</a>
+                </div>
+                <div class="tool-card">
+                    <h4>假设检验</h4>
+                    <p>统计假设检验和显著性分析</p>
+                    <a href="tools/analyze/hypothesis-test.html" class="btn btn-small">使用工具</a>
+                </div>
+                <div class="tool-card">
+                    <h4>SPC控制图</h4>
+                    <p>统计过程控制图生成和分析</p>
+                    <a href="tools/control/spc.html" class="btn btn-small">使用工具</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="learning-stats">
+            <h3>平台统计</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">23</div>
+                    <div class="stat-label">实用工具</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">视频教程</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">学习案例</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">15+</div>
+                    <div class="stat-label">下载模板</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 6 Sigma质量管理学习平台. 专注于数据处理和工具应用</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

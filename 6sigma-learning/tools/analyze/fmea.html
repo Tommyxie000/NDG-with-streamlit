@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FMEA失效模式与影响分析 - 6 Sigma质量管理学习平台</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tools.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>6 Sigma质量管理学习平台</h1>
+                <p>FMEA失效模式与影响分析</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../../index.html">首页</a></li>
+                    <li><a href="../index.html" class="active">工具库</a></li>
+                    <li><a href="../../videos/index.html">视频教程</a></li>
+                    <li><a href="../../cases/index.html">培训案例</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="tool-intro">
+            <h2>FMEA失效模式与影响分析 (Failure Mode and Effects Analysis)</h2>
+            <p>FMEA是6 Sigma分析阶段的核心工具，用于系统性地识别潜在的失效模式、评估其影响并优先处理风险较高的失效模式。通过量化严重度（S）、发生度（O）和探测度（D），可以计算出风险优先数（RPN），帮助团队集中精力于最关键的失效模式。</p>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <h4>应用场景</h4>
+                    <ul>
+                        <li>新产品设计阶段的可靠性分析</li>
+                        <li>过程改进前的风险识别</li>
+                        <li>现有产品或过程的系统性改进</li>
+                        <li>识别潜在的顾客不满意问题</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>核心指标</h4>
+                    <ul>
+                        <li><strong>严重度 (Severity)</strong>：失效后果的严重程度</li>
+                        <li><strong>发生度 (Occurrence)</strong>：失效发生的可能性</li>
+                        <li><strong>探测度 (Detection)</strong>：检测到失效的难度</li>
+                        <li><strong>RPN</strong>：风险优先数 = 严重度 × 发生度 × 探测度</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>评分标准</h4>
+                    <ul>
+                        <li><strong>严重度</strong>：1=无影响，10=严重危险</li>
+                        <li><strong>发生度</strong>：1=几乎不发生，10=极高可能</li>
+                        <li><strong>探测度</strong>：1=总是发现，10=几乎发现不了</li>
+                        <li><strong>RPN</strong>：数值越高，风险越大，优先处理</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-calculator">
+            <h3>FMEA分析</h3>
+            <div class="calculator-grid">
+                <div class="input-group">
+                    <label>项目/过程名称：</label>
+                    <input type="text" id="project-name" placeholder="输入项目或过程名称">
+                </div>
+                <div class="input-group">
+                    <label>功能描述：</label>
+                    <input type="text" id="function-description" placeholder="输入功能或过程描述">
+                </div>
+                <div class="input-group">
+                    <label>失效模式：</label>
+                    <input type="text" id="failure-mode" placeholder="输入潜在失效模式">
+                </div>
+                <div class="input-group">
+                    <label>失效影响：</label>
+                    <textarea id="failure-effect" rows="3" placeholder="输入失效模式的影响"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>失效原因：</label>
+                    <textarea id="failure-cause" rows="3" placeholder="输入失效的可能原因"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>严重度 (S)：</label>
+                    <input type="number" id="severity" min="1" max="10" value="5">
+                </div>
+                <div class="input-group">
+                    <label>发生度 (O)：</label>
+                    <input type="number" id="occurrence" min="1" max="10" value="5">
+                </div>
+                <div class="input-group">
+                    <label>探测度 (D)：</label>
+                    <input type="number" id="detection" min="1" max="10" value="5">
+                </div>
+                <div class="input-group">
+                    <label>预防措施：</label>
+                    <textarea id="prevention" rows="3" placeholder="输入预防失效发生的措施"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>检测措施：</label>
+                    <textarea id="detection-measures" rows="3" placeholder="输入检测失效的措施"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>改进措施：</label>
+                    <textarea id="improvement" rows="3" placeholder="输入改进措施"></textarea>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="addFMEAEntry()" class="btn btn-primary">添加FMEA条目</button>
+                <button onclick="clearInputs()" class="btn btn-secondary">清空输入</button>
+                <button onclick="exportResults()" class="btn btn-success">导出结果</button>
+            </div>
+        </section>
+
+        <section class="results-section" id="results-section" style="display: none;">
+            <h3>FMEA分析结果</h3>
+            <div class="results-grid">
+                <div class="result-card">
+                    <h4>风险优先级</h4>
+                    <div class="result-item">
+                        <span>条目数量：</span>
+                        <strong id="result-entry-count">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>最高RPN：</span>
+                        <strong id="result-highest-rpn">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>平均RPN：</span>
+                        <strong id="result-avg-rpn">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>严重度统计</h4>
+                    <div class="result-item">
+                        <span>严重度≥8的条目：</span>
+                        <strong id="result-high-severity">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>发生度≥7的条目：</span>
+                        <strong id="result-high-occurrence">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>探测度≥7的条目：</span>
+                        <strong id="result-high-detection">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>风险评估</h4>
+                    <div class="result-item">
+                        <span>高风险条目：</span>
+                        <strong id="result-high-risk">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>中风险条目：</span>
+                        <strong id="result-medium-risk">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>低风险条目：</span>
+                        <strong id="result-low-risk">-</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h4>RPN分布图</h4>
+                <div style="height: 400px; margin: 20px 0;">
+                    <canvas id="rpn-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h4>失效模式风险排序</h4>
+                <div style="height: 400px; margin: 20px 0;">
+                    <canvas id="risk-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="table-section">
+                <h4>FMEA详细表</h4>
+                <div class="table-container">
+                    <table id="fmea-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>功能</th>
+                                <th>失效模式</th>
+                                <th>失效影响</th>
+                                <th>严重度</th>
+                                <th>发生度</th>
+                                <th>探测度</th>
+                                <th>RPN</th>
+                                <th>优先级</th>
+                                <th>改进措施</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fmea-table-body">
+                            <!-- 动态内容 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-steps">
+            <h3>操作步骤</h3>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>确定FMEA范围</h4>
+                        <p>明确要分析的特定系统、子系统、组件或过程。确定分析是设计FMEA（DFMEA）还是过程FMEA（PFMEA）。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>组建跨功能团队</h4>
+                        <p>组建包括设计工程、制造、质量、生产、采购、销售和客户等代表的跨功能团队。确保团队成员了解所分析的产品或过程。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>识别功能</h4>
+                        <p>列出产品或过程的所有主要功能和相关的性能要求。这些功能应基于客户的需求和期望。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>识别失效模式</h4>
+                        <p>对于每个功能，系统性地识别可能的失效模式。失效模式应该明确、可观察，并且用产品或过程特性的术语来描述。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>评估失效影响</h4>
+                        <p>对于每个失效模式，识别其对系统、组件、下一级组件或最终用户的影响。评估严重度、发生度和探测度，并计算RPN。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>制定改进措施</h4>
+                        <p>对于高RPN的失效模式，制定改进措施以降低风险。优先关注降低严重度，然后是发生度和探测度。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-notes">
+            <h3>注意事项</h3>
+            <div class="notes-list">
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>团队协作</strong>：FMEA是一个团队活动，需要不同职能和经验水平的成员参与，确保全面识别潜在问题。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>评分标准</strong>：建立一致的评分标准，确保团队成员对严重度、发生度和探测度的评估保持一致。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>动态过程</strong>：FMEA不是一次性活动，而是一个动态过程。随着对产品或过程的了解增加，应定期更新FMEA。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>关注客户</strong>：始终关注失效模式对最终客户的影响，而不仅仅是内部标准或规范。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">💡</span>
+                    <p><strong>量化RPN</strong>：RPN只是一个起点，应结合其他因素（如严重度）做出决策。高严重度但中等RPN的失效模式可能需要优先处理。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="related-tools">
+            <h3>相关工具</h3>
+            <div class="related-grid">
+                <div class="related-item">
+                    <h4>假设检验</h4>
+                    <p>验证改进措施的有效性</p>
+                    <a href="hypothesis-test.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>MSA分析</h4>
+                    <p>评估测量系统是否准确可靠</p>
+                    <a href="../measure/msa.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>过程能力分析</h4>
+                    <p>评估过程是否满足规格要求</p>
+                    <a href="../measure/process-capability.html" class="btn btn-small">查看工具</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-recommendations">
+            <h3>推荐视频教程</h3>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>FMEA基础与实战</h4>
+                        <p>YouTube - Six Sigma Institute</p>
+                        <span class="video-duration">20分钟</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=example1" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>FMEA评分标准详解</h4>
+                        <p>B站 - 质量管理学习</p>
+                        <span class="video-duration">18分钟</span>
+                    </div>
+                    <a href="https://www.bilibili.com/video/BV1example" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 6 Sigma质量管理学习平台. 专注于数据处理和工具应用</p>
+        </div>
+    </footer>
+
+    <script src="../../js/tools.js"></script>
+    <script>
+        let fmeaEntries = [];
+        let rpnChart = null;
+        let riskChart = null;
+
+        // 添加FMEA条目
+        function addFMEAEntry() {
+            const projectName = document.getElementById('project-name').value.trim();
+            const functionDescription = document.getElementById('function-description').value.trim();
+            const failureMode = document.getElementById('failure-mode').value.trim();
+            const failureEffect = document.getElementById('failure-effect').value.trim();
+            const failureCause = document.getElementById('failure-cause').value.trim();
+            const severity = parseInt(document.getElementById('severity').value);
+            const occurrence = parseInt(document.getElementById('occurrence').value);
+            const detection = parseInt(document.getElementById('detection').value);
+            const prevention = document.getElementById('prevention').value.trim();
+            const detectionMeasures = document.getElementById('detection-measures').value.trim();
+            const improvement = document.getElementById('improvement').value.trim();
+
+            // 验证输入
+            if (!projectName) {
+                alert('请输入项目/过程名称');
+                return;
+            }
+
+            if (!functionDescription) {
+                alert('请输入功能描述');
+                return;
+            }
+
+            if (!failureMode) {
+                alert('请输入失效模式');
+                return;
+            }
+
+            if (!failureEffect) {
+                alert('请输入失效影响');
+                return;
+            }
+
+            if (isNaN(severity) || severity < 1 || severity > 10) {
+                alert('严重度必须是1-10之间的数字');
+                return;
+            }
+
+            if (isNaN(occurrence) || occurrence < 1 || occurrence > 10) {
+                alert('发生度必须是1-10之间的数字');
+                return;
+            }
+
+            if (isNaN(detection) || detection < 1 || detection > 10) {
+                alert('探测度必须是1-10之间的数字');
+                return;
+            }
+
+            // 创建FMEA条目
+            const rpn = severity * occurrence * detection;
+            const entry = {
+                projectName: projectName,
+                functionDescription: functionDescription,
+                failureMode: failureMode,
+                failureEffect: failureEffect,
+                failureCause: failureCause,
+                severity: severity,
+                occurrence: occurrence,
+                detection: detection,
+                rpn: rpn,
+                prevention: prevention,
+                detectionMeasures: detectionMeasures,
+                improvement: improvement
+            };
+
+            // 添加到数组
+            fmeaEntries.push(entry);
+
+            // 更新结果部分
+            updateResults();
+
+            // 清空输入
+            clearInputs();
+
+            // 显示结果部分
+            document.getElementById('results-section').style.display = 'block';
+        }
+
+        // 更新结果部分
+        function updateResults() {
+            if (fmeaEntries.length === 0) {
+                document.getElementById('results-section').style.display = 'none';
+                return;
+            }
+
+            // 更新统计信息
+            document.getElementById('result-entry-count').textContent = fmeaEntries.length;
+
+            // 计算最高RPN
+            let highestRPN = 0;
+            fmeaEntries.forEach(entry => {
+                if (entry.rpn > highestRPN) {
+                    highestRPN = entry.rpn;
+                }
+            });
+            document.getElementById('result-highest-rpn').textContent = highestRPN;
+
+            // 计算平均RPN
+            const avgRPN = fmeaEntries.reduce((sum, entry) => sum + entry.rpn, 0) / fmeaEntries.length;
+            document.getElementById('result-avg-rpn').textContent = avgRPN.toFixed(2);
+
+            // 统计严重度≥8的条目
+            const highSeverityCount = fmeaEntries.filter(entry => entry.severity >= 8).length;
+            document.getElementById('result-high-severity').textContent = highSeverityCount;
+
+            // 统计发生度≥7的条目
+            const highOccurrenceCount = fmeaEntries.filter(entry => entry.occurrence >= 7).length;
+            document.getElementById('result-high-occurrence').textContent = highOccurrenceCount;
+
+            // 统计探测度≥7的条目
+            const highDetectionCount = fmeaEntries.filter(entry => entry.detection >= 7).length;
+            document.getElementById('result-high-detection').textContent = highDetectionCount;
+
+            // 风险评估
+            let highRisk = 0;
+            let mediumRisk = 0;
+            let lowRisk = 0;
+
+            fmeaEntries.forEach(entry => {
+                if (entry.rpn >= 200 || entry.severity >= 8) {
+                    highRisk++;
+                } else if (entry.rpn >= 100 || entry.severity >= 6) {
+                    mediumRisk++;
+                } else {
+                    lowRisk++;
+                }
+            });
+
+            document.getElementById('result-high-risk').textContent = highRisk;
+            document.getElementById('result-medium-risk').textContent = mediumRisk;
+            document.getElementById('result-low-risk').textContent = lowRisk;
+
+            // 更新表格
+            updateTable();
+
+            // 绘制图表
+            drawRPNChart();
+            drawRiskChart();
+        }
+
+        // 更新表格
+        function updateTable() {
+            const tbody = document.getElementById('fmea-table-body');
+            tbody.innerHTML = '';
+
+            // 按RPN排序
+            const sortedEntries = [...fmeaEntries].sort((a, b) => b.rpn - a.rpn);
+
+            // 创建表格行
+            sortedEntries.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                
+                // 创建单元格
+                const functionCell = document.createElement('td');
+                functionCell.textContent = entry.functionDescription;
+                row.appendChild(functionCell);
+
+                const failureModeCell = document.createElement('td');
+                failureModeCell.textContent = entry.failureMode;
+                row.appendChild(failureModeCell);
+
+                const failureEffectCell = document.createElement('td');
+                failureEffectCell.textContent = entry.failureEffect;
+                row.appendChild(failureEffectCell);
+
+                const severityCell = document.createElement('td');
+                severityCell.textContent = entry.severity;
+                if (entry.severity >= 8) {
+                    severityCell.style.backgroundColor = 'rgba(255, 99, 132, 0.2)';
+                } else if (entry.severity >= 6) {
+                    severityCell.style.backgroundColor = 'rgba(255, 159, 64, 0.2)';
+                }
+                row.appendChild(severityCell);
+
+                const occurrenceCell = document.createElement('td');
+                occurrenceCell.textContent = entry.occurrence;
+                if (entry.occurrence >= 7) {
+                    occurrenceCell.style.backgroundColor = 'rgba(255, 99, 132, 0.2)';
+                } else if (entry.occurrence >= 5) {
+                    occurrenceCell.style.backgroundColor = 'rgba(255, 159, 64, 0.2)';
+                }
+                row.appendChild(occurrenceCell);
+
+                const detectionCell = document.createElement('td');
+                detectionCell.textContent = entry.detection;
+                if (entry.detection >= 7) {
+                    detectionCell.style.backgroundColor = 'rgba(255, 99, 132, 0.2)';
+                } else if (entry.detection >= 5) {
+                    detectionCell.style.backgroundColor = 'rgba(255, 159, 64, 0.2)';
+                }
+                row.appendChild(detectionCell);
+
+                const rpnCell = document.createElement('td');
+                rpnCell.textContent = entry.rpn;
+                if (entry.rpn >= 200) {
+                    rpnCell.style.backgroundColor = 'rgba(255, 99, 132, 0.2)';
+                } else if (entry.rpn >= 100) {
+                    rpnCell.style.backgroundColor = 'rgba(255, 159, 64, 0.2)';
+                }
+                row.appendChild(rpnCell);
+
+                const priorityCell = document.createElement('td');
+                priorityCell.textContent = index + 1;
+                row.appendChild(priorityCell);
+
+                const improvementCell = document.createElement('td');
+                improvementCell.textContent = entry.improvement || '无';
+                row.appendChild(improvementCell);
+
+                // 添加行到表格
+                tbody.appendChild(row);
+            });
+        }
+
+        // 绘制RPN分布图
+        function drawRPNChart() {
+            const ctx = document.getElementById('rpn-chart').getContext('2d');
+            
+            if (rpnChart) {
+                rpnChart.destroy();
+            }
+
+            // 按RPN范围分类
+            const ranges = [
+                { min: 0, max: 100, label: '0-100' },
+                { min: 101, max: 200, label: '101-200' },
+                { min: 201, max: 300, label: '201-300' },
+                { min: 301, max: 500, label: '301-500' },
+                { min: 501, max: 1000, label: '501-1000' }
+            ];
+
+            const counts = ranges.map(range => {
+                return fmeaEntries.filter(entry => entry.rpn >= range.min && entry.rpn <= range.max).length;
+            });
+
+            rpnChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ranges.map(range => range.label),
+                    datasets: [{
+                        label: '条目数量',
+                        data: counts,
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'RPN分布'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 绘制失效模式风险排序图
+        function drawRiskChart() {
+            const ctx = document.getElementById('risk-chart').getContext('2d');
+            
+            if (riskChart) {
+                riskChart.destroy();
+            }
+
+            // 按RPN排序，只显示前10项
+            const sortedEntries = [...fmeaEntries].sort((a, b) => b.rpn - a.rpn).slice(0, 10);
+
+            riskChart = new Chart(ctx, {
+                type: 'horizontalBar',
+                data: {
+                    labels: sortedEntries.map(entry => entry.failureMode),
+                    datasets: [{
+                        label: 'RPN',
+                        data: sortedEntries.map(entry => entry.rpn),
+                        backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: '风险排序（前10项）'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // 清空输入
+        function clearInputs() {
+            document.getElementById('project-name').value = '';
+            document.getElementById('function-description').value = '';
+            document.getElementById('failure-mode').value = '';
+            document.getElementById('failure-effect').value = '';
+            document.getElementById('failure-cause').value = '';
+            document.getElementById('severity').value = 5;
+            document.getElementById('occurrence').value = 5;
+            document.getElementById('detection').value = 5;
+            document.getElementById('prevention').value = '';
+            document.getElementById('detection-measures').value = '';
+            document.getElementById('improvement').value = '';
+        }
+
+        // 导出结果
+        function exportResults() {
+            if (fmeaEntries.length === 0) {
+                alert('没有可导出的数据');
+                return;
+            }
+
+            // 创建CSV内容
+            let csvContent = '项目/过程名称,功能描述,失效模式,失效影响,失效原因,严重度,发生度,探测度,RPN,预防措施,检测措施,改进措施\n';
+            
+            fmeaEntries.forEach(entry => {
+                csvContent += `"${entry.projectName}","${entry.functionDescription}","${entry.failureMode}","${entry.failureEffect}","${entry.failureCause}",${entry.severity},${entry.occurrence},${entry.detection},${entry.rpn},"${entry.prevention}","${entry.detectionMeasures}","${entry.improvement}"\n`;
+            });
+
+            // 下载CSV文件
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'FMEA分析结果.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>

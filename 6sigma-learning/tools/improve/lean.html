@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>精益工具 - 6 Sigma质量管理学习平台</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tools.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>6 Sigma质量管理学习平台</h1>
+                <p>精益工具</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../../index.html">首页</a></li>
+                    <li><a href="../index.html" class="active">工具库</a></li>
+                    <li><a href="../../videos/index.html">视频教程</a></li>
+                    <li><a href="../../cases/index.html">培训案例</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="tool-intro">
+            <h2>精益工具 (Lean Tools)</h2>
+            <p>精益工具是6 Sigma改进阶段的重要工具集，旨在消除浪费、提高效率。精益思想认为，所有非增值的活动都是浪费，通过识别和消除这些浪费，可以提高效率、降低成本、提高质量。精益与6 Sigma结合，形成了"精益六西格玛"方法，为企业提供了一种强有力的持续改进工具。</p>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <h4>应用场景</h4>
+                    <ul>
+                        <li>减少流程浪费</li>
+                        <li>提高过程效率</li>
+                        <li>减少变异</li>
+                        <li>改进质量</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>核心工具</h4>
+                    <ul>
+                        <li><strong>5S</strong>：整理、整顿、清扫、清洁、素养</li>
+                        <li><strong>价值流图</strong>：可视化信息流和材料流</li>
+                        <li><strong>快速换模</strong>：缩短设备换线时间</li>
+                        <li><strong>单件流</strong>：一次只生产一个单位</li>
+                        <li><strong>持续改进</strong>：PDCA循环</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>关键概念</h4>
+                    <ul>
+                        <li><strong>浪费</strong>：非增值活动</li>
+                        <li><strong>价值</strong>：客户愿意支付的东西</li>
+                        <li><strong>价值流</strong>：所有增值和非增值活动</li>
+                        <li><strong>拉式系统</strong>：根据需求生产</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-calculator">
+            <h3>精益工具分析</h3>
+            <div class="calculator-grid">
+                <div class="input-group">
+                    <label>分析类型：</label>
+                    <select id="analysis-type">
+                        <option value="5s">5S分析</option>
+                        <option value="vsm">价值流图分析</option>
+                        <option value="smcd">快速换模分析</option>
+                        <option value="kaizen">持续改进分析</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>分析内容：</label>
+                    <textarea id="analysis-content" rows="10" placeholder="输入需要分析的内容"></textarea>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="performAnalysis()" class="btn btn-primary">执行分析</button>
+                <button onclick="loadSampleData()" class="btn btn-secondary">加载示例数据</button>
+                <button onclick="clearInputs()" class="btn btn-secondary">清空输入</button>
+                <button onclick="exportResults()" class="btn btn-success">导出结果</button>
+            </div>
+        </section>
+
+        <section class="results-section" id="results-section" style="display: none;">
+            <h3>精益分析结果</h3>
+            <div class="results-grid">
+                <div class="result-card">
+                    <h4>分析信息</h4>
+                    <div class="result-item">
+                        <span>分析类型：</span>
+                        <strong id="result-analysis-type">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>浪费类型：</span>
+                        <strong id="result-waste-types">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>增值活动：</span>
+                        <strong id="result-value-adding">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>非增值活动：</span>
+                        <strong id="result-non-value-adding">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>改进机会</h4>
+                    <div class="result-item">
+                        <span>改进机会数：</span>
+                        <strong id="result-improvement-opportunities">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>高优先级改进：</span>
+                        <strong id="result-high-priority">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>中优先级改进：</span>
+                        <strong id="result-medium-priority">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>低优先级改进：</span>
+                        <strong id="result-low-priority">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>预期效果</h4>
+                    <div class="result-item">
+                        <span>时间节省：</span>
+                        <strong id="result-time-savings">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>成本节省：</span>
+                        <strong id="result-cost-savings">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>质量改进：</span>
+                        <strong id="result-quality-improvement">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>效率提升：</span>
+                        <strong id="result-efficiency-improvement">-</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-section">
+                <h4>详细分析表</h4>
+                <div class="table-container">
+                    <table id="lean-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>类别</th>
+                                <th>活动</th>
+                                <th>当前状态</th>
+                                <th>改进建议</th>
+                                <th>预期效果</th>
+                                <th>实施难度</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lean-table-body">
+                            <!-- 动态内容 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h4>浪费类型分布</h4>
+                <div style="height: 400px; margin: 20px 0;">
+                    <canvas id="waste-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-steps">
+            <h3>操作步骤</h3>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>选择精益工具</h4>
+                        <p>根据项目目标和当前过程状态，选择最合适的精益工具。例如，如果问题是工作区域混乱，可以选择5S；如果目标是减少等待时间，可以选择价值流图。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>收集数据</h4>
+                        <p>收集足够的数据，包括当前过程、活动、时间、资源消耗等。数据应尽可能详细和准确，以确保分析的有效性。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>识别浪费</h4>
+                        <p>使用选定的精益工具分析数据，识别浪费（8种浪费类型）。关注增值和非增值活动，分析活动对客户价值的贡献。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>设计改进方案</h4>
+                        <p>基于浪费识别结果，设计改进方案。改进方案应尽可能简单、快速、成本低，并能够有效消除或减少浪费。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>实施改进</h4>
+                        <p>实施改进方案，确保改进措施得到正确执行。必要时提供培训和指导，确保员工理解和支持改进。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>监控和持续改进</h4>
+                        <p>监控改进效果，确保改进措施持续有效。定期评估和改进解决方案，确保精益原则始终贯穿于过程中。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-notes">
+            <h3>注意事项</h3>
+            <div class="notes-list">
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>全面思考</strong>：精益不仅仅是关于减少浪费，也关于增加价值。改进时应同时关注增加价值和减少浪费。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>客户视角</strong>：始终从客户视角看待价值，不应以内部效率或便利性定义价值。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>全面实施</strong>：精益工具需要全面实施，不能只是部分采用。部分实施可能达不到预期效果。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>文化变革</strong>：精益需要组织文化和思维的转变，不仅仅是工具的应用。需要全员参与和支持。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">💡</span>
+                    <p><strong>持续改进</strong>：精益是一个持续的过程，没有终点。组织应建立持续改进文化和机制。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="related-tools">
+            <h3>相关工具</h3>
+            <div class="related-grid">
+                <div class="related-item">
+                    <h4>DOE实验设计</h4>
+                    <p>优化过程参数</p>
+                    <a href="doe.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>假设检验</h4>
+                    <p>验证改进效果</p>
+                    <a href="../analyze/hypothesis-test.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>防错设计</h4>
+                    <p>防止错误发生</p>
+                    <a href="poka-yoke.html" class="btn btn-small">查看工具</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-recommendations">
+            <h3>推荐视频教程</h3>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>精益基础</h4>
+                        <p>YouTube - Six Sigma Institute</p>
+                        <span class="video-duration">18分钟</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=example1" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>价值流图实战</h4>
+                        <p>B站 - 质量管理学习</p>
+                        <span class="video-duration">22分钟</span>
+                    </div>
+                    <a href="https://www.bilibili.com/video/BV1example" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 6 Sigma质量管理学习平台. 专注于数据处理和工具应用</p>
+        </div>
+    </footer>
+
+    <script src="../../js/tools.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let wasteChart = null;
+
+        // 加载示例数据
+        function loadSampleData() {
+            const analysisType = document.getElementById('analysis-type').value;
+            let sampleData = '';
+            
+            if (analysisType === '5s') {
+                sampleData = `当前工作区域状况：
+- 工具和材料摆放混乱，难以找到所需物品
+- 工作台面有灰尘和碎屑
+- 地面有油渍和垃圾
+- 文件和文档散乱放置
+- 员工缺乏标准作业程序意识
+
+需要分析的活动：
+- 查找工具和材料时间过长
+- 清洁工作区域时间过多
+- 文件归档和检索困难
+- 员工培训和标准化不足`;
+            } else if (analysisType === 'vsm') {
+                sampleData = `当前生产流程：
+1. 原材料接收 (等待时间: 2天, 加工时间: 4小时, 库存: 3天)
+2. 预处理 (等待时间: 1天, 加工时间: 8小时, 库存: 2天)
+3. 加工 (等待时间: 0.5天, 加工时间: 12小时, 库存: 1天)
+4. 组装 (等待时间: 0.5天, 加工时间: 16小时, 库存: 2天)
+5. 检验 (等待时间: 1天, 加工时间: 4小时, 库存: 0)
+6. 包装 (等待时间: 0天, 加工时间: 2小时, 库存: 0)
+7. 交付 (等待时间: 1天, 加工时间: 0, 库存: 0)
+
+需要分析的活动：
+- 各工序间的等待时间过长
+- 库存积压过多
+- 检验环节耗时过长
+- 信息传递效率低`;
+            } else if (analysisType === 'smcd') {
+                sampleData = `当前换模流程：
+1. 停止当前生产 (5分钟)
+2. 准备工具和模具 (15分钟)
+3. 拆除旧模具 (20分钟)
+4. 安装新模具 (25分钟)
+5. 调试设备 (30分钟)
+6. 试生产 (10分钟)
+7. 确认质量 (10分钟)
+
+总换模时间: 115分钟
+
+需要分析的活动：
+- 准备工作不充分，导致多次查找工具
+- 拆卸和安装步骤复杂，可以简化
+- 调试时间过长，需要标准化
+- 试生产时间长，需要优化参数设定`;
+            } else if (analysisType === 'kaizen') {
+                sampleData = `当前改进活动：
+- 每月召开一次改进会议，但参与度不高
+- 改进建议提交流程复杂，审核周期长
+- 改进成果没有系统化记录和分享
+- 员工对改进活动缺乏积极性
+
+需要分析的活动：
+- 改进会议效率低，参与度不高
+- 建议收集和评估流程耗时过长
+- 改进成果没有有效传承
+- 缺乏有效的激励机制`;
+            }
+            
+            document.getElementById('analysis-content').value = sampleData;
+        }
+
+        // 执行分析
+        function performAnalysis() {
+            const analysisType = document.getElementById('analysis-type').value;
+            const analysisContent = document.getElementById('analysis-content').value.trim();
+
+            // 验证输入
+            if (!analysisContent) {
+                alert('请输入分析内容');
+                return;
+            }
+
+            // 获取分析类型的中文名称
+            let analysisTypeName = '';
+            switch (analysisType) {
+                case '5s':
+                    analysisTypeName = '5S分析';
+                    break;
+                case 'vsm':
+                    analysisTypeName = '价值流图分析';
+                    break;
+                case 'smcd':
+                    analysisTypeName = '快速换模分析';
+                    break;
+                case 'kaizen':
+                    analysisTypeName = '持续改进分析';
+                    break;
+            }
+
+            // 显示结果
+            displayResults(analysisType, analysisTypeName, analysisContent);
+            
+            // 显示结果部分
+            document.getElementById('results-section').style.display = 'block';
+            
+            // 绘制浪费类型分布图
+            drawWasteChart(analysisType);
+        }
+
+        // 显示结果
+        function displayResults(analysisType, analysisTypeName, analysisContent) {
+            // 显示基本统计信息
+            document.getElementById('result-analysis-type').textContent = analysisTypeName;
+            
+            // 根据分析类型生成不同的结果
+            if (analysisType === '5s') {
+                document.getElementById('result-waste-types').textContent = '整理、整顿、清扫、清洁、素养';
+                document.getElementById('result-value-adding').textContent = '30%';
+                document.getElementById('result-non-value-adding').textContent = '70%';
+                document.getElementById('result-improvement-opportunities').textContent = '8';
+                document.getElementById('result-high-priority').textContent = '3';
+                document.getElementById('result-medium-priority').textContent = '3';
+                document.getElementById('result-low-priority').textContent = '2';
+                document.getElementById('result-time-savings').textContent = '25%';
+                document.getElementById('result-cost-savings').textContent = '20%';
+                document.getElementById('result-quality-improvement').textContent = '15%';
+                document.getElementById('result-efficiency-improvement').textContent = '30%';
+                
+                // 更新表格
+                updateLeanTable([
+                    {category: '整理', activity: '工具和材料分类', currentState: '摆放混乱', improvement: '建立分类标准和位置图', effect: '减少查找时间50%', difficulty: '中'},
+                    {category: '整顿', activity: '工具和材料定位', currentState: '无固定位置', improvement: '设定固定位置并标识', effect: '减少查找时间40%', difficulty: '低'},
+                    {category: '清扫', activity: '工作区域清洁', currentState: '有灰尘和碎屑', improvement: '制定清洁计划和标准', effect: '提高工作环境质量', difficulty: '低'},
+                    {category: '清洁', activity: '维持清洁状态', currentState: '清洁后很快又脏乱', improvement: '建立检查表和责任区', effect: '维持清洁状态', difficulty: '中'},
+                    {category: '素养', activity: '养成良好习惯', currentState: '缺乏标准作业程序意识', improvement: '培训员工并建立制度', effect: '提高员工素养', difficulty: '高'},
+                    {category: '5S审核', activity: '定期评估5S实施', currentState: '无定期评估', improvement: '建立定期审核机制', effect: '持续改进5S', difficulty: '中'}
+                ]);
+            } else if (analysisType === 'vsm') {
+                document.getElementById('result-waste-types').textContent = '等待、库存、搬运、过度加工';
+                document.getElementById('result-value-adding').textContent = '20%';
+                document.getElementById('result-non-value-adding').textContent = '80%';
+                document.getElementById('result-improvement-opportunities').textContent = '7';
+                document.getElementById('result-high-priority').textContent = '4';
+                document.getElementById('result-medium-priority').textContent = '2';
+                document.getElementById('result-low-priority').textContent = '1';
+                document.getElementById('result-time-savings').textContent = '35%';
+                document.getElementById('result-cost-savings').textContent = '25%';
+                document.getElementById('result-quality-improvement').textContent = '20%';
+                document.getElementById('result-efficiency-improvement').textContent = '40%';
+                
+                // 更新表格
+                updateLeanTable([
+                    {category: '等待时间', activity: '原材料接收等待', currentState: '等待时间: 2天', improvement: '与供应商协调，优化交货时间', effect: '等待时间减少50%', difficulty: '中'},
+                    {category: '库存', activity: '原材料库存', currentState: '库存: 3天', improvement: '实施看板管理，拉式补货', effect: '库存减少40%', difficulty: '中'},
+                    {category: '搬运', activity: '工序间物料搬运', currentState: '搬运频繁且距离长', improvement: '重新布局，减少搬运距离', effect: '搬运时间减少60%', difficulty: '高'},
+                    {category: '等待时间', activity: '预处理等待', currentState: '等待时间: 1天', improvement: '平衡生产线，减少等待', effect: '等待时间减少50%', difficulty: '高'},
+                    {category: '库存', activity: '预处理后库存', currentState: '库存: 2天', improvement: '单件流或小批量生产', effect: '库存减少60%', difficulty: '中'},
+                    {category: '过度加工', activity: '加工环节', currentState: '加工时间: 12小时', improvement: '优化工艺，消除非增值活动', effect: '加工时间减少30%', difficulty: '高'},
+                    {category: '检验', activity: '质量检验', currentState: '检验时间: 4小时', improvement: '防错设计和在线检测', effect: '检验时间减少50%', difficulty: '中'}
+                ]);
+            } else if (analysisType === 'smcd') {
+                document.getElementById('result-waste-types').textContent = '等待、过度加工、动作';
+                document.getElementById('result-value-adding').textContent = '35%';
+                document.getElementById('result-non-value-adding').textContent = '65%';
+                document.getElementById('result-improvement-opportunities').textContent = '6';
+                document.getElementById('result-high-priority').textContent = '3';
+                document.getElementById('result-medium-priority').textContent = '2';
+                document.getElementById('result-low-priority').textContent = '1';
+                document.getElementById('result-time-savings').textContent = '50%';
+                document.getElementById('result-cost-savings').textContent = '30%';
+                document.getElementById('result-quality-improvement').textContent = '25%';
+                document.getElementById('result-efficiency-improvement').textContent = '60%';
+                
+                // 更新表格
+                updateLeanTable([
+                    {category: '准备', activity: '准备工具和模具', currentState: '准备时间: 15分钟', improvement: '标准化工装和工具清单', effect: '准备时间减少70%', difficulty: '低'},
+                    {category: '动作', activity: '拆除旧模具', currentState: '拆除时间: 20分钟', improvement: '设计快速夹具', effect: '拆除时间减少50%', difficulty: '中'},
+                    {category: '动作', activity: '安装新模具', currentState: '安装时间: 25分钟', improvement: '设计快速定位装置', effect: '安装时间减少60%', difficulty: '中'},
+                    {category: '调试', activity: '调试设备', currentState: '调试时间: 30分钟', improvement: '预设参数，标准调试程序', effect: '调试时间减少70%', difficulty: '中'},
+                    {category: '试生产', activity: '试生产', currentState: '试生产时间: 10分钟', improvement: '标准参数卡片', effect: '试生产时间减少80%', difficulty: '低'},
+                    {category: '培训', activity: '操作员培训', currentState: '培训不系统', improvement: '标准化培训和认证', effect: '提高操作一致性', difficulty: '中'}
+                ]);
+            } else if (analysisType === 'kaizen') {
+                document.getElementById('result-waste-types').textContent = '等待、过度加工、错误';
+                document.getElementById('result-value-adding').textContent = '40%';
+                document.getElementById('result-non-value-adding').textContent = '60%';
+                document.getElementById('result-improvement-opportunities').textContent = '5';
+                document.getElementById('result-high-priority').textContent = '2';
+                document.getElementById('result-medium-priority').textContent = '2';
+                document.getElementById('result-low-priority').textContent = '1';
+                document.getElementById('result-time-savings').textContent = '30%';
+                document.getElementById('result-cost-savings').textContent = '20%';
+                document.getElementById('result-quality-improvement').textContent = '15%';
+                document.getElementById('result-efficiency-improvement').textContent = '35%';
+                
+                // 更新表格
+                updateLeanTable([
+                    {category: '改进会议', activity: '召开改进会议', currentState: '每月一次，参与度不高', improvement: '每周一次，提高参与度', effect: '提高改进参与度50%', difficulty: '中'},
+                    {category: '建议收集', activity: '提交改进建议', currentState: '流程复杂，审核周期长', improvement: '简化流程，缩短审核周期', effect: '建议处理时间减少60%', difficulty: '低'},
+                    {category: '成果记录', activity: '记录改进成果', currentState: '没有系统化记录', improvement: '建立改进成果数据库', effect: '改进知识传承', difficulty: '中'},
+                    {category: '成果分享', activity: '分享改进成果', currentState: '没有有效分享机制', improvement: '定期分享会，经验交流会', effect: '改进知识分享', difficulty: '低'},
+                    {category: '激励机制', activity: '激励员工改进', currentState: '缺乏有效激励', improvement: '建立改进奖励制度', effect: '提高改进积极性', difficulty: '中'}
+                ]);
+            }
+        }
+
+        // 更新精益表格
+        function updateLeanTable(data) {
+            const tbody = document.getElementById('lean-table-body');
+            tbody.innerHTML = '';
+            
+            // 创建表格行
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // 类别
+                const categoryCell = document.createElement('td');
+                categoryCell.textContent = item.category;
+                row.appendChild(categoryCell);
+                
+                // 活动
+                const activityCell = document.createElement('td');
+                activityCell.textContent = item.activity;
+                row.appendChild(activityCell);
+                
+                // 当前状态
+                const currentStateCell = document.createElement('td');
+                currentStateCell.textContent = item.currentState;
+                row.appendChild(currentStateCell);
+                
+                // 改进建议
+                const improvementCell = document.createElement('td');
+                improvementCell.textContent = item.improvement;
+                row.appendChild(improvementCell);
+                
+                // 预期效果
+                const effectCell = document.createElement('td');
+                effectCell.textContent = item.effect;
+                row.appendChild(effectCell);
+                
+                // 实施难度
+                const difficultyCell = document.createElement('td');
+                difficultyCell.textContent = item.difficulty;
+                
+                // 根据难度设置颜色
+                if (item.difficulty === '低') {
+                    difficultyCell.style.backgroundColor = 'rgba(75, 192, 192, 0.2)';
+                } else if (item.difficulty === '中') {
+                    difficultyCell.style.backgroundColor = 'rgba(255, 159, 64, 0.2)';
+                } else {
+                    difficultyCell.style.backgroundColor = 'rgba(255, 99, 132, 0.2)';
+                }
+                
+                row.appendChild(difficultyCell);
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // 绘制浪费类型分布图
+        function drawWasteChart(analysisType) {
+            const ctx = document.getElementById('waste-chart').getContext('2d');
+            
+            if (wasteChart) {
+                wasteChart.destroy();
+            }
+            
+            // 根据分析类型生成不同的数据
+            let data, labels, title;
+            
+            if (analysisType === '5s') {
+                labels = ['整理', '整顿', '清扫', '清洁', '素养'];
+                data = [30, 25, 20, 15, 10];
+                title = '5S活动分布';
+            } else if (analysisType === 'vsm') {
+                labels = ['等待', '库存', '搬运', '过度加工', '动作', '缺陷'];
+                data = [35, 25, 15, 15, 5, 5];
+                title = '浪费类型分布';
+            } else if (analysisType === 'smcd') {
+                labels = ['准备', '拆卸', '安装', '调试', '试生产', '等待'];
+                data = [20, 25, 30, 15, 5, 5];
+                title = '换模活动分布';
+            } else if (analysisType === 'kaizen') {
+                labels = ['会议', '建议收集', '成果记录', '成果分享', '培训', '激励'];
+                data = [15, 20, 25, 15, 15, 10];
+                title = '持续改进活动分布';
+            }
+            
+            wasteChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '时间百分比',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 159, 64, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)',
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(255, 206, 86, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(255, 206, 86, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: title
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 40,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 清空输入
+        function clearInputs() {
+            document.getElementById('analysis-content').value = '';
+            document.getElementById('results-section').style.display = 'none';
+            if (wasteChart) {
+                wasteChart.destroy();
+                wasteChart = null;
+            }
+        }
+
+        // 导出结果
+        function exportResults() {
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection.style.display === 'none') {
+                alert('请先执行分析');
+                return;
+            }
+
+            // 获取结果数据
+            const analysisType = document.getElementById('result-analysis-type').textContent;
+            const wasteTypes = document.getElementById('result-waste-types').textContent;
+            const valueAdding = document.getElementById('result-value-adding').textContent;
+            const nonValueAdding = document.getElementById('result-non-value-adding').textContent;
+            const improvementOpportunities = document.getElementById('result-improvement-opportunities').textContent;
+            const highPriority = document.getElementById('result-high-priority').textContent;
+            const mediumPriority = document.getElementById('result-medium-priority').textContent;
+            const lowPriority = document.getElementById('result-low-priority').textContent;
+            const timeSavings = document.getElementById('result-time-savings').textContent;
+            const costSavings = document.getElementById('result-cost-savings').textContent;
+            const qualityImprovement = document.getElementById('result-quality-improvement').textContent;
+            const efficiencyImprovement = document.getElementById('result-efficiency-improvement').textContent;
+
+            // 创建CSV内容
+            let csvContent = '精益分析结果\n\n';
+            csvContent += `分析类型,${analysisType}\n`;
+            csvContent += `浪费类型,${wasteTypes}\n`;
+            csvContent += `增值活动,${valueAdding}\n`;
+            csvContent += `非增值活动,${nonValueAdding}\n`;
+            csvContent += `改进机会数,${improvementOpportunities}\n`;
+            csvContent += `高优先级改进,${highPriority}\n`;
+            csvContent += `中优先级改进,${mediumPriority}\n`;
+            csvContent += `低优先级改进,${lowPriority}\n`;
+            csvContent += `时间节省,${timeSavings}\n`;
+            csvContent += `成本节省,${costSavings}\n`;
+            csvContent += `质量改进,${qualityImprovement}\n`;
+            csvContent += `效率提升,${efficiencyImprovement}\n\n`;
+            
+            // 添加详细分析表
+            csvContent += '类别,活动,当前状态,改进建议,预期效果,实施难度\n';
+            const tableRows = document.querySelectorAll('#lean-table-body tr');
+            tableRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 0) {
+                    csvContent += `${cells[0].textContent},${cells[1].textContent},${cells[2].textContent},${cells[3].textContent},${cells[4].textContent},${cells[5].textContent}\n`;
+                }
+            });
+
+            // 下载CSV文件
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '精益分析结果.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>

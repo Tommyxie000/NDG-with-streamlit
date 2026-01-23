@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>改进方案工具 - 6 Sigma质量管理学习平台</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tools.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>6 Sigma质量管理学习平台</h1>
+                <p>改进方案工具</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../../index.html">首页</a></li>
+                    <li><a href="../index.html" class="active">工具库</a></li>
+                    <li><a href="../../videos/index.html">视频教程</a></li>
+                    <li><a href="../../cases/index.html">培训案例</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="tool-intro">
+            <h2>改进方案工具 (Solution Selection Matrix)</h2>
+            <p>改进方案工具是一种用于评估和选择最佳改进方案的决策工具。通过为各种改进方案设定评价标准，并根据这些标准对方案进行评分，可以客观地比较不同方案的优缺点，选择最合适的改进方案。</p>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <h4>应用场景</h4>
+                    <ul>
+                        <li>比较多种改进方案</li>
+                        <li>评估方案的成本效益</li>
+                        <li>确定优先级</li>
+                        <li>做出客观决策</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>评价维度</h4>
+                    <ul>
+                        <li><strong>效果</strong>：方案对问题的影响程度</li>
+                        <li><strong>成本</strong>：实施成本</li>
+                        <li><strong>可行性</strong>：实施难易程度</li>
+                        <li><strong>风险</strong>：潜在风险</li>
+                        <li><strong>时间</strong>：实施时间</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>益处</h4>
+                    <ul>
+                        <li>客观评估方案</li>
+                        <li>减少主观偏见</li>
+                        <li>明确决策依据</li>
+                        <li>提高决策质量</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-calculator">
+            <h3>改进方案评估工具</h3>
+            <div class="calculator-grid">
+                <div class="input-group">
+                    <label>方案数量：</label>
+                    <input type="number" id="solution-count" min="2" max="10" value="3">
+                </div>
+                <div class="input-group">
+                    <label>评价维度：</label>
+                    <input type="number" id="dimension-count" min="3" max="10" value="5">
+                </div>
+                <div class="input-group">
+                    <label>方案名称：</label>
+                    <input type="text" id="solution-names" placeholder="用逗号分隔，例如：方案1,方案2,方案3">
+                </div>
+                <div class="input-group">
+                    <label>评价维度名称：</label>
+                    <input type="text" id="dimension-names" placeholder="用逗号分隔，例如：效果,成本,可行性,风险,时间">
+                </div>
+                <div class="input-group">
+                    <label>评价维度权重（用逗号分隔，总和应为100）：</label>
+                    <input type="text" id="dimension-weights" placeholder="例如：30,20,20,15,15">
+                </div>
+                <div class="input-group">
+                    <label>方案评分：</label>
+                    <textarea id="solution-scores" rows="10" placeholder="输入各方案在各维度的评分（用逗号分隔）：
+方案1评分：
+5,4,3,2,1
+方案2评分：
+4,3,5,3,2
+方案3评分：
+3,5,4,4,3"></textarea>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="analyzeSolutions()" class="btn btn-primary">分析方案</button>
+                <button onclick="loadSampleData()" class="btn btn-secondary">加载示例数据</button>
+                <button onclick="clearInputs()" class="btn btn-secondary">清空输入</button>
+                <button onclick="exportResults()" class="btn btn-success">导出结果</button>
+            </div>
+        </section>
+
+        <section class="results-section" id="results-section" style="display: none;">
+            <h3>改进方案分析结果</h3>
+            <div class="results-grid">
+                <div class="result-card">
+                    <h4>评价信息</h4>
+                    <div class="result-item">
+                        <span>方案数量：</span>
+                        <strong id="result-solution-count">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>评价维度：</span>
+                        <strong id="result-dimension-count">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>评价维度权重总和：</span>
+                        <strong id="result-weight-sum">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>最高分方案：</span>
+                        <strong id="result-highest-score">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>排名结果</h4>
+                    <div class="result-item">
+                        <span>第1名：</span>
+                        <strong id="result-first-place">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>第2名：</span>
+                        <strong id="result-second-place">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>第3名：</span>
+                        <strong id="result-third-place">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>推荐方案：</span>
+                        <strong id="result-recommended">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>评分统计</h4>
+                    <div class="result-item">
+                        <span>平均分：</span>
+                        <strong id="result-average-score">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>最高分：</span>
+                        <strong id="result-max-score">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>最低分：</span>
+                        <strong id="result-min-score">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>分数差：</span>
+                        <strong id="result-score-range">-</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-section">
+                <h4>详细评分表</h4>
+                <div class="table-container">
+                    <table id="solution-table" class="data-table">
+                        <thead id="solution-table-head">
+                            <!-- 动态内容 -->
+                        </thead>
+                        <tbody id="solution-table-body">
+                            <!-- 动态内容 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="table-section">
+                <h4>方案排名表</h4>
+                <div class="table-container">
+                    <table id="ranking-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>方案</th>
+                                <th>总分</th>
+                                <th>评价</th>
+                                <th>优势</th>
+                                <th>劣势</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ranking-table-body">
+                            <!-- 动态内容 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-steps">
+            <h3>操作步骤</h3>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>确定评价维度</h4>
+                        <p>确定用于评价改进方案的维度和标准。这些维度应全面反映方案的价值，通常包括效果、成本、可行性、风险和时间等。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>设定权重</h4>
+                        <p>为每个评价维度设定权重，反映其重要性。权重之和应等于100%。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>评分方案</h4>
+                        <p>为每个改进方案在各个维度上评分。评分通常采用1-5分或1-10分制，分数越高表示在该维度上表现越好。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>计算总分</h4>
+                        <p>根据各维度的权重和评分，计算每个方案的总分。总分 = Σ(维度权重 × 维度评分)。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>排序方案</h4>
+                        <p>根据总分对方案进行排序，得分最高的方案为推荐方案。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>评估推荐方案</h4>
+                        <p>对推荐方案进行详细分析，识别其优势和劣势，考虑可能的实施挑战和风险。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-notes">
+            <h3>注意事项</h3>
+            <div class="notes-list">
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>客观评分</strong>：评分应尽可能客观，避免主观偏见。可以多人评分并取平均值，或者采用德尔菲法。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>权重合理</strong>：权重设置应反映实际情况和优先级。例如，如果预算有限，成本维度的权重应较高。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>维度全面</strong>：评价维度应全面反映方案的价值，避免遗漏重要因素。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>验证结果</strong>：最终推荐方案应通过实际可行性和风险评估验证，确保不仅评分高，而且实际可行。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">💡</span>
+                    <p><strong>多场景分析</strong>：可以进行不同场景下的敏感性分析，评估权重变化对排名的影响。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="related-tools">
+            <h3>相关工具</h3>
+            <div class="related-grid">
+                <div class="related-item">
+                    <h4>DOE实验设计</h4>
+                    <p>优化过程参数</p>
+                    <a href="doe.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>精益工具</h4>
+                    <p>减少浪费，提高效率</p>
+                    <a href="lean.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>防错设计</h4>
+                    <p>防止错误发生</p>
+                    <a href="poka-yoke.html" class="btn btn-small">查看工具</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-recommendations">
+            <h3>推荐视频教程</h3>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>方案评估基础</h4>
+                        <p>YouTube - Six Sigma Institute</p>
+                        <span class="video-duration">18分钟</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=example1" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>改进方案实战</h4>
+                        <p>B站 - 质量管理学习</p>
+                        <span class="video-duration">22分钟</span>
+                    </div>
+                    <a href="https://www.bilibili.com/video/BV1example" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 6 Sigma质量管理学习平台. 专注于数据处理和工具应用</p>
+        </div>
+    </footer>
+
+    <script src="../../js/tools.js"></script>
+    <script>
+        // 加载示例数据
+        function loadSampleData() {
+            document.getElementById('solution-count').value = 3;
+            document.getElementById('dimension-count').value = 5;
+            document.getElementById('solution-names').value = '方案A,方案B,方案C';
+            document.getElementById('dimension-names').value = '效果,成本,可行性,风险,时间';
+            document.getElementById('dimension-weights').value = '30,20,20,15,15';
+            document.getElementById('solution-scores').value = `方案A评分：
+5,4,3,2,1
+方案B评分：
+4,3,5,3,2
+方案C评分：
+3,5,4,4,3`;
+        }
+
+        // 分析方案
+        function analyzeSolutions() {
+            const solutionCount = parseInt(document.getElementById('solution-count').value);
+            const dimensionCount = parseInt(document.getElementById('dimension-count').value);
+            const solutionNames = document.getElementById('solution-names').value.trim();
+            const dimensionNames = document.getElementById('dimension-names').value.trim();
+            const dimensionWeights = document.getElementById('dimension-weights').value.trim();
+            const solutionScoresText = document.getElementById('solution-scores').value.trim();
+
+            // 验证输入
+            if (!solutionNames) {
+                alert('请输入方案名称');
+                return;
+            }
+
+            if (!dimensionNames) {
+                alert('请输入评价维度名称');
+                return;
+            }
+
+            if (!dimensionWeights) {
+                alert('请输入评价维度权重');
+                return;
+            }
+
+            if (!solutionScoresText) {
+                alert('请输入方案评分');
+                return;
+            }
+
+            // 解析方案名称
+            const solutionNameList = solutionNames.split(',').map(name => name.trim());
+
+            // 解析维度名称
+            const dimensionNameList = dimensionNames.split(',').map(name => name.trim());
+
+            // 解析权重
+            const dimensionWeightList = dimensionWeights.split(',').map(w => parseFloat(w.trim()));
+            const weightSum = dimensionWeightList.reduce((sum, w) => sum + w, 0);
+
+            // 验证权重总和
+            if (Math.abs(weightSum - 100) > 0.01) {
+                alert(`权重总和应为100，当前总和为${weightSum}`);
+                return;
+            }
+
+            // 解析评分
+            const scoreLines = solutionScoresText.split('\n').filter(line => line.trim() !== '');
+            const scores = [];
+
+            scoreLines.forEach(line => {
+                // 检查是否是评分行（包含"评分"）
+                if (line.includes('评分')) {
+                    const scoreValues = line.split(':')[1].split(',').map(s => parseFloat(s.trim()));
+                    if (scoreValues.length === dimensionCount) {
+                        scores.push(scoreValues);
+                    } else {
+                        alert(`评分数据格式错误，期望${dimensionCount}个数值，实际${scoreValues.length}个`);
+                        return;
+                    }
+                }
+            });
+
+            // 验证评分数据数量
+            if (scores.length !== solutionCount) {
+                alert(`评分数据数量错误，期望${solutionCount}组数据，实际${scores.length}组`);
+                return;
+            }
+
+            // 计算总分
+            const totalScores = scores.map(scoreList => {
+                return scoreList.reduce((sum, score, index) => sum + score * (dimensionWeightList[index] / 100), 0);
+            });
+
+            // 创建方案对象
+            const solutions = solutionNameList.map((name, index) => ({
+                name: name,
+                scores: scores[index],
+                totalScore: totalScores[index]
+            }));
+
+            // 按总分排序
+            solutions.sort((a, b) => b.totalScore - a.totalScore);
+
+            // 显示结果
+            displayResults(solutions, dimensionNameList, dimensionWeightList);
+            
+            // 显示结果部分
+            document.getElementById('results-section').style.display = 'block';
+        }
+
+        // 显示结果
+        function displayResults(solutions, dimensionNames, dimensionWeights) {
+            // 显示基本信息
+            document.getElementById('result-solution-count').textContent = solutions.length;
+            document.getElementById('result-dimension-count').textContent = dimensionNames.length;
+            document.getElementById('result-weight-sum').textContent = dimensionWeights.reduce((sum, w) => sum + w, 0);
+            
+            // 排名信息
+            if (solutions.length >= 1) {
+                document.getElementById('result-first-place').textContent = `${solutions[0].name} (${solutions[0].totalScore.toFixed(2)})`;
+            }
+            if (solutions.length >= 2) {
+                document.getElementById('result-second-place').textContent = `${solutions[1].name} (${solutions[1].totalScore.toFixed(2)})`;
+            }
+            if (solutions.length >= 3) {
+                document.getElementById('result-third-place').textContent = `${solutions[2].name} (${solutions[2].totalScore.toFixed(2)})`;
+            }
+            
+            // 推荐方案
+            if (solutions.length > 0) {
+                document.getElementById('result-recommended').textContent = solutions[0].name;
+                document.getElementById('result-highest-score').textContent = solutions[0].name;
+            }
+            
+            // 评分统计
+            if (solutions.length > 0) {
+                const totalScores = solutions.map(s => s.totalScore);
+                const avgScore = totalScores.reduce((sum, score) => sum + score, 0) / totalScores.length;
+                const maxScore = Math.max(...totalScores);
+                const minScore = Math.min(...totalScores);
+                const scoreRange = maxScore - minScore;
+                
+                document.getElementById('result-average-score').textContent = avgScore.toFixed(2);
+                document.getElementById('result-max-score').textContent = maxScore.toFixed(2);
+                document.getElementById('result-min-score').textContent = minScore.toFixed(2);
+                document.getElementById('result-score-range').textContent = scoreRange.toFixed(2);
+            }
+            
+            // 更新详细评分表
+            updateSolutionTable(solutions, dimensionNames);
+            
+            // 更新方案排名表
+            updateRankingTable(solutions, dimensionNames);
+        }
+
+        // 更新详细评分表
+        function updateSolutionTable(solutions, dimensionNames) {
+            const thead = document.getElementById('solution-table-head');
+            const tbody = document.getElementById('solution-table-body');
+            
+            // 清空表格
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+            
+            // 创建表头
+            const headerRow = document.createElement('tr');
+            
+            // 方案名称列
+            const nameHeader = document.createElement('th');
+            nameHeader.textContent = '方案';
+            headerRow.appendChild(nameHeader);
+            
+            // 维度列
+            dimensionNames.forEach((dimension, index) => {
+                const weight = parseFloat(document.getElementById('dimension-weights').value.split(',')[index].trim());
+                const header = document.createElement('th');
+                header.textContent = `${dimension} (权重: ${weight}%)`;
+                headerRow.appendChild(header);
+            });
+            
+            // 总分列
+            const totalHeader = document.createElement('th');
+            totalHeader.textContent = '总分';
+            headerRow.appendChild(totalHeader);
+            
+            thead.appendChild(headerRow);
+            
+            // 创建表格行
+            solutions.forEach(solution => {
+                const row = document.createElement('tr');
+                
+                // 方案名称
+                const nameCell = document.createElement('td');
+                nameCell.textContent = solution.name;
+                row.appendChild(nameCell);
+                
+                // 评分
+                solution.scores.forEach(score => {
+                    const cell = document.createElement('td');
+                    cell.textContent = score;
+                    
+                    // 根据分数设置颜色
+                    if (score >= 4.5) {
+                        cell.style.backgroundColor = 'rgba(75, 192, 192, 0.2)';
+                    } else if (score >= 3.5) {
+                        cell.style.backgroundColor = 'rgba(255, 159, 64, 0.2)';
+                    } else {
+                        cell.style.backgroundColor = 'rgba(255, 99, 132, 0.2)';
+                    }
+                    
+                    row.appendChild(cell);
+                });
+                
+                // 总分
+                const totalCell = document.createElement('td');
+                totalCell.textContent = solution.totalScore.toFixed(2);
+                row.appendChild(totalCell);
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // 更新方案排名表
+        function updateRankingTable(solutions, dimensionNames) {
+            const tbody = document.getElementById('ranking-table-body');
+            
+            // 清空表格
+            tbody.innerHTML = '';
+            
+            // 创建表格行
+            solutions.forEach((solution, index) => {
+                const row = document.createElement('tr');
+                
+                // 排名
+                const rankCell = document.createElement('td');
+                rankCell.textContent = index + 1;
+                row.appendChild(rankCell);
+                
+                // 方案
+                const nameCell = document.createElement('td');
+                nameCell.textContent = solution.name;
+                row.appendChild(nameCell);
+                
+                // 总分
+                const totalCell = document.createElement('td');
+                totalCell.textContent = solution.totalScore.toFixed(2);
+                row.appendChild(totalCell);
+                
+                // 评价
+                const evalCell = document.createElement('td');
+                if (index === 0) {
+                    evalCell.textContent = '强烈推荐';
+                    evalCell.style.backgroundColor = 'rgba(75, 192, 192, 0.2)';
+                } else if (index === 1) {
+                    evalCell.textContent = '推荐';
+                    evalCell.style.backgroundColor = 'rgba(255, 159, 64, 0.2)';
+                } else {
+                    evalCell.textContent = '可考虑';
+                    evalCell.style.backgroundColor = 'rgba(255, 99, 132, 0.2)';
+                }
+                row.appendChild(evalCell);
+                
+                // 优势
+                const strengthCell = document.createElement('td');
+                // 找出得分最高的维度
+                const maxScoreIndex = solution.scores.indexOf(Math.max(...solution.scores));
+                strengthCell.textContent = `${dimensionNames[maxScoreIndex]}得分最高`;
+                row.appendChild(strengthCell);
+                
+                // 劣势
+                const weaknessCell = document.createElement('td');
+                // 找出得分最低的维度
+                const minScoreIndex = solution.scores.indexOf(Math.min(...solution.scores));
+                weaknessCell.textContent = `${dimensionNames[minScoreIndex]}得分最低`;
+                row.appendChild(weaknessCell);
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // 清空输入
+        function clearInputs() {
+            document.getElementById('solution-names').value = '';
+            document.getElementById('dimension-names').value = '';
+            document.getElementById('dimension-weights').value = '';
+            document.getElementById('solution-scores').value = '';
+            document.getElementById('results-section').style.display = 'none';
+        }
+
+        // 导出结果
+        function exportResults() {
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection.style.display === 'none') {
+                alert('请先分析方案');
+                return;
+            }
+
+            // 获取结果数据
+            const solutionCount = document.getElementById('result-solution-count').textContent;
+            const dimensionCount = document.getElementById('result-dimension-count').textContent;
+            const weightSum = document.getElementById('result-weight-sum').textContent;
+            const highestScore = document.getElementById('result-highest-score').textContent;
+            const firstPlace = document.getElementById('result-first-place').textContent;
+            const secondPlace = document.getElementById('result-second-place').textContent;
+            const thirdPlace = document.getElementById('result-third-place').textContent;
+            const recommended = document.getElementById('result-recommended').textContent;
+            const averageScore = document.getElementById('result-average-score').textContent;
+            const maxScore = document.getElementById('result-max-score').textContent;
+            const minScore = document.getElementById('result-min-score').textContent;
+            const scoreRange = document.getElementById('result-score-range').textContent;
+
+            // 创建CSV内容
+            let csvContent = '改进方案评估\n\n';
+            csvContent += `方案数量,${solutionCount}\n`;
+            csvContent += `评价维度,${dimensionCount}\n`;
+            csvContent += `评价维度权重总和,${weightSum}\n`;
+            csvContent += `最高分方案,${highestScore}\n`;
+            csvContent += `第1名,${firstPlace}\n`;
+            csvContent += `第2名,${secondPlace}\n`;
+            csvContent += `第3名,${thirdPlace}\n`;
+            csvContent += `推荐方案,${recommended}\n`;
+            csvContent += `平均分,${averageScore}\n`;
+            csvContent += `最高分,${maxScore}\n`;
+            csvContent += `最低分,${minScore}\n`;
+            csvContent += `分数差,${scoreRange}\n\n`;
+            
+            // 添加详细评分表
+            csvContent += '详细评分表\n';
+            const solutionTableHead = document.querySelectorAll('#solution-table-head th');
+            if (solutionTableHead.length > 0) {
+                const headers = Array.from(solutionTableHead).map(th => th.textContent);
+                csvContent += headers.join(',') + '\n';
+                
+                const solutionTableRows = document.querySelectorAll('#solution-table-body tr');
+                solutionTableRows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    const rowData = Array.from(cells).map(cell => cell.textContent);
+                    csvContent += rowData.join(',') + '\n';
+                });
+            }
+            
+            csvContent += '\n方案排名表\n';
+            csvContent += '排名,方案,总分,评价,优势,劣势\n';
+            const rankingTableRows = document.querySelectorAll('#ranking-table-body tr');
+            rankingTableRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = Array.from(cells).map(cell => cell.textContent);
+                csvContent += rowData.join(',') + '\n';
+            });
+
+            // 下载CSV文件
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '改进方案评估.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+/* 学习路径页面专用样式 */
+
+.level-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.level-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 25px;
+    color: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.level-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.level-card[data-level="yellow"] {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.level-card[data-level="green"] {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.level-card[data-level="black"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.level-info {
+    margin: 20px 0;
+}
+
+.level-info p {
+    margin: 8px 0;
+    font-size: 14px;
+}
+
+.progress-bar {
+    position: relative;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    height: 20px;
+    margin-top: 15px;
+}
+
+.progress-fill {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    height: 100%;
+    width: 0%;
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* 学习路径时间线样式 */
+.path-timeline {
+    position: relative;
+    margin: 40px 0;
+    padding-left: 40px;
+}
+
+.path-timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #667eea, #764ba2);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 40px;
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.timeline-item:hover {
+    transform: translateX(5px);
+}
+
+.timeline-item.completed {
+    border-left: 5px solid #4CAF50;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -35px;
+    top: 30px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #667eea;
+    border: 4px solid white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.timeline-item.completed .timeline-marker {
+    background: #4CAF50;
+}
+
+.timeline-content h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.timeline-content p {
+    color: #666;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.module-topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.topic {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.related-tools {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.related-tools h5 {
+    margin: 0 0 10px 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.tool-link {
+    display: inline-block;
+    background: #f0f0f0;
+    color: #555;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-decoration: none;
+    margin: 2px;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.tool-link:hover {
+    background: #667eea;
+    color: white;
+}
+
+/* 学习进度跟踪样式 */
+.progress-tracking {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 25px;
+    margin: 30px 0;
+}
+
+.progress-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.progress-form label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.progress-form select,
+.progress-form input {
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.progress-form select:focus,
+.progress-form input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.progress-summary h4 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.achievements {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.achievement {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.achievement.achieved {
+    opacity: 1;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.achievement-icon {
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.achievement-text {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* 个性化建议样式 */
+.recommendations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.recommendation-card {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.recommendation-card:hover {
+    transform: translateY(-5px);
+}
+
+.recommendation-card h4 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.recommendation-card p {
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .level-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .path-timeline {
+        padding-left: 30px;
+    }
+    
+    .timeline-marker {
+        left: -25px;
+        width: 15px;
+        height: 15px;
+    }
+    
+    .progress-form {
+        grid-template-columns: 1fr;
+    }
+    
+    .achievements {
+        flex-direction: column;
+    }
+    
+    .recommendations-grid {
+        grid-template-columns: 1fr;
+    }
+}

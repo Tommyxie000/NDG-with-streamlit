@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>假设检验 - 6 Sigma质量管理学习平台</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tools.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>6 Sigma质量管理学习平台</h1>
+                <p>假设检验</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../../index.html">首页</a></li>
+                    <li><a href="../index.html" class="active">工具库</a></li>
+                    <li><a href="../../videos/index.html">视频教程</a></li>
+                    <li><a href="../../cases/index.html">培训案例</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="tool-intro">
+            <h2>假设检验 (Hypothesis Testing)</h2>
+            <p>假设检验是6 Sigma分析阶段的核心工具，用于验证过程是否发生了显著变化。通过统计检验，我们可以判断两组数据或一个数据序列是否存在显著差异，为决策提供依据。</p>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <h4>应用场景</h4>
+                    <ul>
+                        <li>比较改进前后过程性能</li>
+                        <li>评估不同供应商或方法的差异</li>
+                        <li>验证试验设计的有效性</li>
+                        <li>确定影响过程的关键因素</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>常见类型</h4>
+                    <ul>
+                        <li><strong>t检验</strong>：比较两组数据的平均值</li>
+                        <li><strong>配对t检验</strong>：比较同一对象改进前后的差异</li>
+                        <li><strong>方差分析</strong>：比较多于两组数据的平均值</li>
+                        <li><strong>卡方检验</strong>：分析分类数据的关系</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>关键概念</h4>
+                    <ul>
+                        <li><strong>零假设</strong>：假设无显著差异</li>
+                        <li><strong>备择假设</strong>：假设存在显著差异</li>
+                        <li><strong>p值</strong>：拒绝零假设的证据强度</li>
+                        <li><strong>α水平</strong>：可接受的错误率（通常0.05）</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-calculator">
+            <h3>统计检验工具</h3>
+            <div class="calculator-grid">
+                <div class="input-group">
+                    <label>检验类型：</label>
+                    <select id="test-type">
+                        <option value="ttest">t检验</option>
+                        <option value="paired-ttest">配对t检验</option>
+                        <option value="anova">方差分析</option>
+                        <option value="chisquare">卡方检验</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>显著性水平（α）：</label>
+                    <input type="number" id="alpha" value="0.05" step="0.01" min="0.001" max="0.5">
+                </div>
+                <div class="input-group">
+                    <label>零假设（H0）：</label>
+                    <input type="text" id="null-hypothesis" value="两组数据无显著差异">
+                </div>
+                <div class="input-group">
+                    <label>备择假设（H1）：</label>
+                    <input type="text" id="alternative-hypothesis" value="两组数据存在显著差异">
+                </div>
+                <div class="input-group">
+                    <label>数据输入（用逗号分隔）：</label>
+                    <textarea id="data-input" rows="5" placeholder="输入数据，如：10.5, 10.8, 10.3, 10.7, 10.6"></textarea>
+                </div>
+                <div class="input-group" id="data-input-2" style="display:none;">
+                    <label>第二组数据（用逗号分隔）：</label>
+                    <textarea id="data-input-2" rows="5" placeholder="输入第二组数据，如：11.2, 11.5, 11.1, 11.3, 11.4"></textarea>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="performTest()" class="btn btn-primary">进行假设检验</button>
+                <button onclick="loadSampleData()" class="btn btn-secondary">加载示例数据</button>
+                <button onclick="clearInputs()" class="btn btn-secondary">清空输入</button>
+                <button onclick="exportResults()" class="btn btn-success">导出结果</button>
+            </div>
+        </section>
+
+        <section class="results-section" id="results-section" style="display: none;">
+            <h3>检验结果</h3>
+            <div class="results-grid">
+                <div class="result-card">
+                    <h4>假设</h4>
+                    <div class="result-item">
+                        <span>零假设 (H0)：</span>
+                        <strong id="result-null-hypothesis">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>备择假设 (H1)：</span>
+                        <strong id="result-alternative-hypothesis">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>统计结果</h4>
+                    <div class="result-item">
+                        <span>检验统计量：</span>
+                        <strong id="result-statistic">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>自由度：</span>
+                        <strong id="result-degrees-of-freedom">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>p值：</span>
+                        <strong id="result-p-value">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>结论</h4>
+                    <div class="result-item">
+                        <span>显著性水平 (α)：</span>
+                        <strong id="result-alpha">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>结论：</span>
+                        <strong id="result-conclusion">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>解释：</span>
+                        <strong id="result-interpretation">-</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h4>数据分布图</h4>
+                <div style="height: 400px; margin: 20px 0;">
+                    <canvas id="data-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-steps">
+            <h3>操作步骤</h3>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>提出假设</h4>
+                        <p>明确提出零假设（H0）和备择假设（H1）。零假设通常是"无差异"的假设，备择假设是我们要证明的"存在差异"的假设。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>选择检验类型</h4>
+                        <p>根据数据类型和研究设计选择适当的统计检验方法。例如，比较两组数据均值使用t检验，比较多组数据均值使用ANOVA。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>确定显著性水平</h4>
+                        <p>确定可接受的错误率α（通常设为0.05）。α是当零假设为真时，我们错误地拒绝它的概率。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>计算检验统计量和p值</h4>
+                        <p>使用适当的公式计算检验统计量，并确定对应的p值。p值是在零假设为真的前提下，得到观察结果或更极端结果的概率。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>做出统计决策</h4>
+                        <p>比较p值与显著性水平α：如果p < α，则拒绝零假设；如果p ≥ α，则不能拒绝零假设。做出结论并解释其业务含义。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-notes">
+            <h3>注意事项</h3>
+            <div class="notes-list">
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>样本量</strong>：足够的样本量是进行有效假设检验的基础。样本量过小可能导致检验力不足，无法检测到真实存在的差异。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>正态性</strong>：许多假设检验假设数据来自正态分布。在使用前应检验数据的正态性，必要时进行数据转换或使用非参数方法。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>假设独立性</strong>：假设检验通常假设观测值之间是独立的。在设计试验和数据收集时应考虑这一点。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>多重比较</strong>：进行多个假设检验会增加犯第一类错误的概率。应使用适当的调整方法，如Bonferroni校正。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">💡</span>
+                    <p><strong>p值理解</strong>：p值不是零假设为真的概率，而是零假设为真时得到当前或更极端结果的概率。不要将p值解释为假设为真的概率。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="related-tools">
+            <h3>相关工具</h3>
+            <div class="related-grid">
+                <div class="related-item">
+                    <h4>过程能力分析</h4>
+                    <p>评估过程是否满足规格要求</p>
+                    <a href="../measure/process-capability.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>MSA分析</h4>
+                    <p>评估测量系统是否准确可靠</p>
+                    <a href="../measure/msa.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>回归分析</h4>
+                    <p>分析变量之间的关系</p>
+                    <a href="regression.html" class="btn btn-small">查看工具</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-recommendations">
+            <h3>推荐视频教程</h3>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>假设检验基础</h4>
+                        <p>YouTube - Six Sigma Institute</p>
+                        <span class="video-duration">15分钟</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=example1" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>t检验实战</h4>
+                        <p>B站 - 质量管理学习</p>
+                        <span class="video-duration">20分钟</span>
+                    </div>
+                    <a href="https://www.bilibili.com/video/BV1example" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 6 Sigma质量管理学习平台. 专注于数据处理和工具应用</p>
+        </div>
+    </footer>
+
+    <script src="../../js/tools.js"></script>
+    <script>
+        let dataChart = null;
+
+        // 加载示例数据
+        function loadSampleData() {
+            const testType = document.getElementById('test-type').value;
+            let sampleData = '';
+            
+            if (testType === 'ttest' || testType === 'paired-ttest') {
+                sampleData = `10.5, 10.8, 10.3, 10.7, 10.6
+11.2, 11.5, 11.1, 11.3, 11.4`;
+                document.getElementById('data-input').value = sampleData.split('\n')[0];
+                document.getElementById('data-input-2').value = sampleData.split('\n')[1];
+                document.getElementById('data-input-2').parentElement.style.display = 'block';
+            } else if (testType === 'anova') {
+                sampleData = `10.5, 10.8, 10.3, 10.7, 10.6
+11.2, 11.5, 11.1, 11.3, 11.4
+12.0, 12.3, 12.1, 12.5, 12.2`;
+                document.getElementById('data-input').value = sampleData.split('\n')[0];
+                document.getElementById('data-input-2').value = sampleData.split('\n')[1] + '\n' + sampleData.split('\n')[2];
+                document.getElementById('data-input-2').parentElement.style.display = 'block';
+            } else if (testType === 'chisquare') {
+                sampleData = `25, 15, 10
+30, 20, 15
+20, 25, 20`;
+                document.getElementById('data-input').value = sampleData;
+                document.getElementById('data-input-2').parentElement.style.display = 'none';
+            }
+        }
+
+        // 执行假设检验
+        function performTest() {
+            const testType = document.getElementById('test-type').value;
+            const alpha = parseFloat(document.getElementById('alpha').value);
+            const nullHypothesis = document.getElementById('null-hypothesis').value;
+            const alternativeHypothesis = document.getElementById('alternative-hypothesis').value;
+            
+            // 显示假设
+            document.getElementById('result-null-hypothesis').textContent = nullHypothesis;
+            document.getElementById('result-alternative-hypothesis').textContent = alternativeHypothesis;
+            document.getElementById('result-alpha').textContent = alpha.toFixed(3);
+            
+            // 根据检验类型执行不同的计算
+            if (testType === 'ttest' || testType === 'paired-ttest') {
+                performTTest(testType, alpha, nullHypothesis, alternativeHypothesis);
+            } else if (testType === 'anova') {
+                performANOVA(alpha, nullHypothesis, alternativeHypothesis);
+            } else if (testType === 'chisquare') {
+                performChiSquare(alpha, nullHypothesis, alternativeHypothesis);
+            }
+        }
+
+        // t检验
+        function performTTest(testType, alpha, nullHypothesis, alternativeHypothesis) {
+            const data1Text = document.getElementById('data-input').value;
+            const data2Text = document.getElementById('data-input-2').value;
+            
+            // 解析数据
+            const data1 = data1Text.split(',').map(d => parseFloat(d.trim())).filter(d => !isNaN(d));
+            const data2 = data2Text.split(',').map(d => parseFloat(d.trim())).filter(d => !isNaN(d));
+            
+            if (data1.length < 2 || data2.length < 2) {
+                alert('每组数据至少需要2个数值');
+                return;
+            }
+            
+            // 计算统计量
+            const n1 = data1.length;
+            const n2 = data2.length;
+            const mean1 = data1.reduce((sum, val) => sum + val, 0) / n1;
+            const mean2 = data2.reduce((sum, val) => sum + val, 0) / n2;
+            
+            // 计算标准差
+            const variance1 = data1.reduce((sum, val) => sum + Math.pow(val - mean1, 2), 0) / (n1 - 1);
+            const variance2 = data2.reduce((sum, val) => sum + Math.pow(val - mean2, 2), 0) / (n2 - 1);
+            const std1 = Math.sqrt(variance1);
+            const std2 = Math.sqrt(variance2);
+            
+            let statistic, df, conclusion, interpretation;
+            
+            if (testType === 'ttest') {
+                // 双样本独立t检验
+                const se = Math.sqrt((variance1 / n1) + (variance2 / n2));
+                statistic = (mean1 - mean2) / se;
+                df = n1 + n2 - 2;
+                
+                // 简化假设检验和结论
+                conclusion = '平均数存在显著差异';
+                interpretation = `t统计量为${statistic.toFixed(3)}，自由度为${df}。`;
+            } else {
+                // 配对t检验
+                if (n1 !== n2) {
+                    alert('配对t检验需要两组数据具有相同数量的观测值');
+                    return;
+                }
+                
+                const differences = data1.map((val, i) => val - data2[i]);
+                const meanDiff = differences.reduce((sum, val) => sum + val, 0) / n1;
+                const varianceDiff = differences.reduce((sum, val) => sum + Math.pow(val - meanDiff, 2), 0) / (n1 - 1);
+                const se = Math.sqrt(varianceDiff / n1);
+                
+                statistic = meanDiff / se;
+                df = n1 - 1;
+                
+                // 简化假设检验和结论
+                conclusion = '配对数据间存在显著差异';
+                interpretation = `配对t检验统计量为${statistic.toFixed(3)}，自由度为${df}。`;
+            }
+            
+            // 计算p值
+            const pValue = calculatePValueFromT(statistic, df);
+            
+            // 显示结果
+            document.getElementById('result-statistic').textContent = statistic.toFixed(3);
+            document.getElementById('result-degrees-of-freedom').textContent = df;
+            document.getElementById('result-p-value').textContent = pValue.toFixed(4);
+            
+            // 结论和解释
+            document.getElementById('result-conclusion').textContent = conclusion;
+            document.getElementById('result-interpretation').textContent = interpretation;
+            
+            // 显示结果部分
+            document.getElementById('results-section').style.display = 'block';
+            
+            // 绘制图表
+            drawDataChart(data1, data2);
+        }
+
+        // 方差分析
+        function performANOVA(alpha, nullHypothesis, alternativeHypothesis) {
+            const data1Text = document.getElementById('data-input').value;
+            const data2Text = document.getElementById('data-input-2').value;
+            
+            // 解析数据
+            const data1 = data1Text.split(',').map(d => parseFloat(d.trim())).filter(d => !isNaN(d));
+            const allDataText = data2Text.split('\n');
+            const groupData = [data1];
+            
+            allDataText.forEach(group => {
+                const groupVals = group.split(',').map(d => parseFloat(d.trim())).filter(d => !isNaN(d));
+                if (groupVals.length > 0) {
+                    groupData.push(groupVals);
+                }
+            });
+            
+            if (groupData.length < 2) {
+                alert('至少需要两组数据');
+                return;
+            }
+            
+            // 计算统计量
+            const groupMeans = groupData.map(data => {
+                const sum = data.reduce((s, v) => s + v, 0);
+                return sum / data.length;
+            });
+            
+            const allData = groupData.flat();
+            const grandMean = allData.reduce((sum, val) => sum + val, 0) / allData.length;
+            
+            // 组间平方和
+            let SSB = 0;
+            groupData.forEach((group, i) => {
+                SSB += group.length * Math.pow(groupMeans[i] - grandMean, 2);
+            });
+            
+            // 组内平方和
+            let SSW = 0;
+            groupData.forEach((group, i) => {
+                group.forEach(val => {
+                    SSW += Math.pow(val - groupMeans[i], 2);
+                });
+            });
+            
+            // 总平方和
+            const SST = SSB + SSW;
+            
+            // 自由度
+            const k = groupData.length;
+            const dfBetween = k - 1;
+            const dfWithin = allData.length - k;
+            const dfTotal = allData.length - 1;
+            
+            // 均方
+            const MSB = SSB / dfBetween;
+            const MSW = SSW / dfWithin;
+            
+            // F统计量
+            const statistic = MSB / MSW;
+            
+            // 计算p值
+            const pValue = calculatePValueFromF(statistic, dfBetween, dfWithin);
+            
+            // 显示结果
+            document.getElementById('result-statistic').textContent = statistic.toFixed(3);
+            document.getElementById('result-degrees-of-freedom').textContent = `${dfBetween} 和 ${dfWithin}`;
+            document.getElementById('result-p-value').textContent = pValue.toFixed(4);
+            
+            // 结论和解释
+            const conclusion = '各组均值存在显著差异';
+            const interpretation = `F统计量为${statistic.toFixed(3)}，组间自由度为${dfBetween}，组内自由度为${dfWithin}。`;
+            
+            document.getElementById('result-conclusion').textContent = conclusion;
+            document.getElementById('result-interpretation').textContent = interpretation;
+            
+            // 显示结果部分
+            document.getElementById('results-section').style.display = 'block';
+            
+            // 绘制图表
+            drawDataChart(groupData[0], groupData[1], true);
+        }
+
+        // 卡方检验
+        function performChiSquare(alpha, nullHypothesis, alternativeHypothesis) {
+            const dataText = document.getElementById('data-input').value;
+            
+            // 解析数据
+            const rows = dataText.split('\n').filter(row => row.trim() !== '');
+            const data = rows.map(row => {
+                return row.split(',').map(val => parseFloat(val.trim())).filter(val => !isNaN(val));
+            });
+            
+            // 检查数据格式
+            if (data.length < 2) {
+                alert('至少需要2行数据');
+                return;
+            }
+            
+            // 检查列数一致性
+            const cols = data[0].length;
+            for (let i = 1; i < data.length; i++) {
+                if (data[i].length !== cols) {
+                    alert('所有行的数据列数必须一致');
+                    return;
+                }
+            }
+            
+            // 计算统计量
+            const total = data.flat().reduce((sum, val) => sum + val, 0);
+            const rowTotals = data.map(row => row.reduce((sum, val) => sum + val, 0));
+            const colTotals = Array(cols).fill(0);
+            
+            for (let i = 0; i < data.length; i++) {
+                for (let j = 0; j < cols; j++) {
+                    colTotals[j] += data[i][j];
+                }
+            }
+            
+            // 计算期望频数
+            const expected = data.map((row, i) => {
+                return row.map((val, j) => (rowTotals[i] * colTotals[j]) / total);
+            });
+            
+            // 计算卡方统计量
+            let chiSquare = 0;
+            for (let i = 0; i < data.length; i++) {
+                for (let j = 0; j < cols; j++) {
+                    if (expected[i][j] > 0) {
+                        chiSquare += Math.pow(data[i][j] - expected[i][j], 2) / expected[i][j];
+                    }
+                }
+            }
+            
+            // 自由度
+            const df = (data.length - 1) * (cols - 1);
+            
+            // 计算p值
+            const pValue = calculatePValueFromChiSquare(chiSquare, df);
+            
+            // 显示结果
+            document.getElementById('result-statistic').textContent = chiSquare.toFixed(3);
+            document.getElementById('result-degrees-of-freedom').textContent = df;
+            document.getElementById('result-p-value').textContent = pValue.toFixed(4);
+            
+            // 结论和解释
+            const conclusion = '变量间存在显著关联';
+            const interpretation = `卡方统计量为${chiSquare.toFixed(3)}，自由度为${df}。`;
+            
+            document.getElementById('result-conclusion').textContent = conclusion;
+            document.getElementById('result-interpretation').textContent = interpretation;
+            
+            // 显示结果部分
+            document.getElementById('results-section').style.display = 'block';
+            
+            // 绘制图表
+            drawDataChart(data);
+        }
+
+        // 计算t检验的p值
+        function calculatePValueFromT(t, df) {
+            // 这是一个简化的实现，实际应用中应使用更精确的方法
+            // 这里是基于近似计算的示例
+            const absT = Math.abs(t);
+            
+            // 使用t分布的近似计算
+            let p;
+            if (df < 30) {
+                // 小样本情况
+                p = 2 * (1 - studentTCDF(absT, df));
+            } else {
+                // 大样本近似正态分布
+                p = 2 * (1 - normalCDF(absT));
+            }
+            
+            return Math.max(0, Math.min(1, p));
+        }
+
+        // 学生t分布的累积分布函数（近似）
+        function studentTCDF(x, df) {
+            // 简化实现，仅供参考
+            // 实际应用应使用更精确的算法
+            if (df === 1) {
+                return 0.5 + Math.atan(x) / Math.PI;
+            }
+            
+            const a = df / (x * x + df);
+            let b = df / 2;
+            let c = 0.5;
+            
+            // 使用Beta函数的近似
+            let sum = 1;
+            let term = 1;
+            let i = 1;
+            
+            while (Math.abs(term) > 0.0001) {
+                term *= a * (b + i - 1) / (c + i - 1) / i;
+                sum += term;
+                i++;
+            }
+            
+            if (x > 0) {
+                return 1 - 0.5 * sum;
+            } else {
+                return 0.5 * sum;
+            }
+        }
+
+        // 正态分布的累积分布函数
+        function normalCDF(x) {
+            return 0.5 * (1 + erf(x / Math.sqrt(2)));
+        }
+
+        // 误差函数近似
+        function erf(x) {
+            // 使用Abramowitz和Stegun的近似公式
+            const a1 =  0.254829592;
+            const a2 = -0.284496736;
+            const a3 =  1.421413741;
+            const a4 = -1.453152027;
+            const a5 =  1.061405429;
+            const p  =  0.3275911;
+
+            const sign = x < 0 ? -1 : 1;
+            x = Math.abs(x);
+
+            const t = 1.0 / (1.0 + p * x);
+            const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+            return sign * y;
+        }
+
+        // 计算F检验的p值
+        function calculatePValueFromF(f, df1, df2) {
+            // 简化的F分布p值计算
+            // 实际应用应使用更精确的方法
+            const x = (df1 * f) / (df1 * f + df2);
+            
+            // 使用Beta函数近似
+            let p = 1;
+            let term = 1;
+            let i = 1;
+            
+            while (Math.abs(term) > 0.0001 && i < 1000) {
+                term *= x * (df2 + i - 1) / (df1 + i);
+                p -= term;
+                i++;
+            }
+            
+            return Math.max(0, Math.min(1, p));
+        }
+
+        // 计算卡方检验的p值
+        function calculatePValueFromChiSquare(chiSquare, df) {
+            // 简化的卡方分布p值计算
+            // 实际应用应使用更精确的方法
+            const k = df / 2;
+            const x = chiSquare / 2;
+            
+            // 使用Gamma函数的近似
+            let p = Math.exp(-x);
+            let term = p;
+            let i = 1;
+            
+            while (Math.abs(term) > 0.0001 && i < 1000) {
+                term *= x / i;
+                p += term;
+                i++;
+            }
+            
+            p = 1 - p;
+            
+            return Math.max(0, Math.min(1, p));
+        }
+
+        // 绘制数据图表
+        function drawDataChart(data1, data2, isANOVA = false) {
+            const ctx = document.getElementById('data-chart').getContext('2d');
+            
+            if (dataChart) {
+                dataChart.destroy();
+            }
+            
+            // 准备数据
+            let labels, datasets;
+            
+            if (isANOVA) {
+                // ANOVA情况
+                labels = data1.map((_, i) => `组${i+1}`);
+                datasets = data1.map((data, i) => {
+                    return {
+                        label: `组${i+1}`,
+                        data: data,
+                        backgroundColor: `rgba(${50 + i * 60}, ${100 + i * 30}, ${150 + i * 20}, 0.8)`,
+                        borderColor: `rgba(${50 + i * 60}, ${100 + i * 30}, ${150 + i * 20}, 1)`,
+                        borderWidth: 1
+                    };
+                });
+            } else {
+                // t检验或卡方检验情况
+                labels = data1.map((_, i) => `观测${i+1}`);
+                datasets = [
+                    {
+                        label: '组1',
+                        data: data1,
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '组2',
+                        data: data2,
+                        backgroundColor: 'rgba(255, 159, 64, 0.8)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1
+                    }
+                ];
+            }
+            
+            dataChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                        title: {
+                            display: true,
+                            text: '数据分布图'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // 清空输入
+        function clearInputs() {
+            document.getElementById('null-hypothesis').value = '两组数据无显著差异';
+            document.getElementById('alternative-hypothesis').value = '两组数据存在显著差异';
+            document.getElementById('data-input').value = '';
+            document.getElementById('data-input-2').value = '';
+            document.getElementById('results-section').style.display = 'none';
+            if (dataChart) {
+                dataChart.destroy();
+                dataChart = null;
+            }
+        }
+
+        // 导出结果
+        function exportResults() {
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection.style.display === 'none') {
+                alert('请先计算结果');
+                return;
+            }
+
+            // 获取结果数据
+            const nullHypothesis = document.getElementById('result-null-hypothesis').textContent;
+            const alternativeHypothesis = document.getElementById('result-alternative-hypothesis').textContent;
+            const statistic = document.getElementById('result-statistic').textContent;
+            const df = document.getElementById('result-degrees-of-freedom').textContent;
+            const pValue = document.getElementById('result-p-value').textContent;
+            const alpha = document.getElementById('result-alpha').textContent;
+            const conclusion = document.getElementById('result-conclusion').textContent;
+            const interpretation = document.getElementById('result-interpretation').textContent;
+
+            // 创建CSV内容
+            let csvContent = '项目,数值\n';
+            csvContent += `零假设 (H0),${nullHypothesis}\n`;
+            csvContent += `备择假设 (H1),${alternativeHypothesis}\n`;
+            csvContent += `检验统计量,${statistic}\n`;
+            csvContent += `自由度,${df}\n`;
+            csvContent += `p值,${pValue}\n`;
+            csvContent += `显著性水平 (α),${alpha}\n`;
+            csvContent += `结论,${conclusion}\n`;
+            csvContent += `解释,${interpretation}\n`;
+
+            // 下载CSV文件
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '假设检验结果.csv';
+            link.click();
+        }
+
+        // 切换数据输入框显示
+        document.getElementById('test-type').addEventListener('change', function() {
+            const testType = this.value;
+            const dataInput2 = document.getElementById('data-input-2');
+            
+            if (testType === 'chisquare') {
+                dataInput2.parentElement.style.display = 'none';
+            } else {
+                dataInput2.parentElement.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

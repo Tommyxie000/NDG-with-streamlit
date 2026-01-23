@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPC统计过程控制 - 6 Sigma质量管理学习平台</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tools.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>6 Sigma质量管理学习平台</h1>
+                <p>SPC统计过程控制</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../../index.html">首页</a></li>
+                    <li><a href="../index.html" class="active">工具库</a></li>
+                    <li><a href="../../videos/index.html">视频教程</a></li>
+                    <li><a href="../../cases/index.html">培训案例</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="tool-intro">
+            <h2>SPC统计过程控制 (Statistical Process Control)</h2>
+            <p>SPC是6 Sigma控制阶段的核心工具，用于监控过程稳定性并识别需要改进的区域。通过控制图分析过程是否处于统计控制状态，帮助团队在质量问题出现前发现问题并采取预防措施。</p>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <h4>应用场景</h4>
+                    <ul>
+                        <li>监控过程性能随时间的变化</li>
+                        <li>识别特殊原因变异</li>
+                        <li>评估过程能力</li>
+                        <li>指导过程改进工作</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>常用控制图</h4>
+                    <ul>
+                        <li><strong>Xbar-R图</strong>：均值和极差控制图</li>
+                        <li><strong>P图</strong>：不合格品率控制图</li>
+                        <li><strong>C图</strong>：缺陷数控制图</li>
+                        <li><strong>U图</strong>：单位缺陷数控制图</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>控制图判断</h4>
+                    <ul>
+                        <li><strong>点超出控制限</strong>：过程失控</li>
+                        <li><strong>连续9点在中心线同侧</strong>：过程偏移</li>
+                        <li><strong>连续6点递增或递减</strong>：过程趋势</li>
+                        <li><strong>14点交替上下</strong>：过程周期性</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-calculator">
+            <h3>SPC控制图分析</h3>
+            <div class="calculator-grid">
+                <div class="input-group">
+                    <label>控制图类型：</label>
+                    <select id="chart-type">
+                        <option value="xbar-r">Xbar-R图</option>
+                        <option value="p-chart">P图（不合格品率）</option>
+                        <option value="c-chart">C图（缺陷数）</option>
+                        <option value="u-chart">U图（单位缺陷数）</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>控制限倍数：</label>
+                    <input type="number" id="control-limit-factor" value="3" step="0.1" min="2" max="4">
+                </div>
+                <div class="input-group">
+                    <label>数据输入：</label>
+                    <textarea id="data-input" rows="10" placeholder="按格式输入数据：
+组号,值1,值2,...值n
+或者：
+时间,值
+..."></textarea>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="generateControlChart()" class="btn btn-primary">生成控制图</button>
+                <button onclick="loadSampleData()" class="btn btn-secondary">加载示例数据</button>
+                <button onclick="clearInputs()" class="btn btn-secondary">清空输入</button>
+                <button onclick="exportResults()" class="btn btn-success">导出结果</button>
+            </div>
+        </section>
+
+        <section class="results-section" id="results-section" style="display: none;">
+            <h3>控制图分析结果</h3>
+            <div class="results-grid">
+                <div class="result-card">
+                    <h4>过程统计信息</h4>
+                    <div class="result-item">
+                        <span>样本组数：</span>
+                        <strong id="result-group-count">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>平均中心线 (CL)：</span>
+                        <strong id="result-center-line">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>上控制限 (UCL)：</span>
+                        <strong id="result-ucl">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>下控制限 (LCL)：</span>
+                        <strong id="result-lcl">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>过程能力指标</h4>
+                    <div class="result-item">
+                        <span>过程平均值 (μ)：</span>
+                        <strong id="result-mean">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>过程标准差 (σ)：</span>
+                        <strong id="result-std">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>过程变异系数：</span>
+                        <strong id="result-cv">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>过程稳定性：</span>
+                        <strong id="result-stability">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>异常点分析</h4>
+                    <div class="result-item">
+                        <span>超出控制限点：</span>
+                        <strong id="result-outliers">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>趋势点：</span>
+                        <strong id="result-trend">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>其他异常点：</span>
+                        <strong id="result-other-issues">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>异常点比例：</span>
+                        <strong id="result-outlier-ratio">-</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h4>控制图</h4>
+                <div style="height: 400px; margin: 20px 0;">
+                    <canvas id="control-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h4>过程能力图</h4>
+                <div style="height: 400px; margin: 20px 0;">
+                    <canvas id="capability-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-steps">
+            <h3>操作步骤</h3>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>选择适当的控制图</h4>
+                        <p>根据数据类型选择适当的控制图：计量型数据使用Xbar-R图，计数型数据使用P、C、U图等。确保数据的测量特性与控制图类型匹配。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>收集基线数据</h4>
+                        <p>收集足够的基线数据（至少20-25组），确保过程在稳定状态下收集数据。数据收集应遵循随机化原则，避免人为影响。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>计算控制限</h4>
+                        <p>根据基线数据计算过程平均值和控制限（上控制限UCL和下控制限LCL）。控制限通常设置为±3σ，即99.73%的数据应落在控制限内。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>评估过程稳定性</h4>
+                        <p>检查控制图是否满足稳定过程的标准：所有点落在控制限内，无明显趋势或模式。如果发现异常点，需调查其原因并采取措施。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>持续监控过程</h4>
+                        <p>一旦控制图建立，应持续监控过程性能。收集新数据并实时绘制控制图，及时发现过程失控的信号。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>定期更新控制限</h4>
+                        <p>当过程发生变化（如实施改进措施）时，应重新计算控制限。确保控制限反映当前过程的真实能力。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-notes">
+            <h3>注意事项</h3>
+            <div class="notes-list">
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>控制限与规格限</strong>：控制限反映过程能力，而规格限反映客户需求。两者不应混淆，即使过程在控制限内，也可能不满足规格要求。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>控制限计算</strong>：控制限应基于过程历史数据计算，而非目标或规格。控制限不是目标值，而是过程实际变异程度的反映。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>特殊原因</strong>：当控制图显示异常时，应查找并消除特殊原因，而不是调整过程。只有在确认过程已发生根本性变化时才调整控制限。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>数据收集</strong>：数据收集计划应基于过程特性，确保数据代表过程的真实状态。测量系统必须可靠，避免测量误差影响控制图分析。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">💡</span>
+                    <p><strong>反应计划</strong>：应建立反应计划，明确当控制图显示异常时应采取的行动。这有助于快速响应过程问题，防止缺陷产生。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="related-tools">
+            <h3>相关工具</h3>
+            <div class="related-grid">
+                <div class="related-item">
+                    <h4>过程能力分析</h4>
+                    <p>评估过程是否满足规格要求</p>
+                    <a href="../measure/process-capability.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>MSA分析</h4>
+                    <p>评估测量系统是否准确可靠</p>
+                    <a href="../measure/msa.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>假设检验</h4>
+                    <p>验证改进措施的有效性</p>
+                    <a href="../analyze/hypothesis-test.html" class="btn btn-small">查看工具</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-recommendations">
+            <h3>推荐视频教程</h3>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>SPC控制图基础</h4>
+                        <p>YouTube - Six Sigma Institute</p>
+                        <span class="video-duration">18分钟</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=example1" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>控制图实战应用</h4>
+                        <p>B站 - 质量管理学习</p>
+                        <span class="video-duration">22分钟</span>
+                    </div>
+                    <a href="https://www.bilibili.com/video/BV1example" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 6 Sigma质量管理学习平台. 专注于数据处理和工具应用</p>
+        </div>
+    </footer>
+
+    <script src="../../js/tools.js"></script>
+    <script>
+        let controlChart = null;
+        let capabilityChart = null;
+
+        // 加载示例数据
+        function loadSampleData() {
+            const chartType = document.getElementById('chart-type').value;
+            let sampleData = '';
+            
+            if (chartType === 'xbar-r') {
+                sampleData = `组号,值1,值2,值3,值4,值5
+1,10.15,10.18,10.12,10.16,10.14
+2,10.17,10.19,10.15,10.13,10.18
+3,10.16,10.14,10.17,10.15,10.16
+4,10.15,10.16,10.18,10.14,10.17
+5,10.16,10.15,10.16,10.18,10.15
+6,10.17,10.16,10.15,10.16,10.17
+7,10.18,10.17,10.16,10.15,10.18
+8,10.15,10.16,10.17,10.18,10.15
+9,10.16,10.15,10.16,10.17,10.16
+10,10.17,10.16,10.15,10.16,10.17`;
+            } else if (chartType === 'p-chart') {
+                sampleData = `样本组号,不合格品数量,样本大小
+1,3,50
+2,2,50
+3,4,50
+4,3,50
+5,5,50
+6,4,50
+7,3,50
+8,4,50
+9,3,50
+10,5,50`;
+            } else if (chartType === 'c-chart') {
+                sampleData = `时间,缺陷数
+1,2
+2,3
+3,2
+4,4
+5,3
+6,2
+7,3
+8,4
+9,3
+10,2`;
+            } else if (chartType === 'u-chart') {
+                sampleData = `时间,缺陷数,单位数量
+1,3,100
+2,2,100
+3,4,100
+4,3,100
+5,5,100
+6,4,100
+7,3,100
+8,4,100
+9,3,100
+10,5,100`;
+            }
+            
+            document.getElementById('data-input').value = sampleData;
+        }
+
+        // 生成控制图
+        function generateControlChart() {
+            const chartType = document.getElementById('chart-type').value;
+            const dataText = document.getElementById('data-input').value.trim();
+            const controlLimitFactor = parseFloat(document.getElementById('control-limit-factor').value);
+            
+            if (!dataText) {
+                alert('请输入数据');
+                return;
+            }
+            
+            // 解析数据
+            const data = parseData(dataText, chartType);
+            
+            if (!data || data.length === 0) {
+                alert('数据格式错误，请检查输入');
+                return;
+            }
+            
+            // 计算控制限和过程统计
+            const stats = calculateControlLimits(data, chartType, controlLimitFactor);
+            
+            // 显示结果
+            displayResults(stats, data, chartType);
+            
+            // 绘制控制图
+            drawControlChart(data, stats, chartType);
+            
+            // 绘制过程能力图
+            drawCapabilityChart(data, stats, chartType);
+            
+            // 显示结果部分
+            document.getElementById('results-section').style.display = 'block';
+        }
+
+        // 解析数据
+        function parseData(dataText, chartType) {
+            const lines = dataText.split('\n').filter(line => line.trim() !== '');
+            
+            if (chartType === 'xbar-r') {
+                // Xbar-R图数据
+                const headers = lines[0].split(',').map(h => h.trim());
+                const data = [];
+                
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',').map(v => parseFloat(v.trim()));
+                    if (values.length > 1) {
+                        const rowData = values.slice(1); // 跳过第一列（组号）
+                        const mean = rowData.reduce((sum, val) => sum + val, 0) / rowData.length;
+                        const range = Math.max(...rowData) - Math.min(...rowData);
+                        data.push({
+                            groupNumber: values[0],
+                            values: rowData,
+                            mean: mean,
+                            range: range
+                        });
+                    }
+                }
+                
+                return data;
+            } else if (chartType === 'p-chart') {
+                // P图数据
+                const data = [];
+                
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',').map(v => parseFloat(v.trim()));
+                    if (values.length >= 2) {
+                        const defective = values[1];
+                        const sampleSize = values[2];
+                        const proportion = defective / sampleSize;
+                        data.push({
+                            sampleNumber: values[0],
+                            defective: defective,
+                            sampleSize: sampleSize,
+                            proportion: proportion
+                        });
+                    }
+                }
+                
+                return data;
+            } else if (chartType === 'c-chart') {
+                // C图数据
+                const data = [];
+                
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',').map(v => parseFloat(v.trim()));
+                    if (values.length >= 2) {
+                        const defects = values[1];
+                        data.push({
+                            time: values[0],
+                            defects: defects
+                        });
+                    }
+                }
+                
+                return data;
+            } else if (chartType === 'u-chart') {
+                // U图数据
+                const data = [];
+                
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',').map(v => parseFloat(v.trim()));
+                    if (values.length >= 3) {
+                        const defects = values[1];
+                        const units = values[2];
+                        const defectsPerUnit = defects / units;
+                        data.push({
+                            time: values[0],
+                            defects: defects,
+                            units: units,
+                            defectsPerUnit: defectsPerUnit
+                        });
+                    }
+                }
+                
+                return data;
+            }
+            
+            return null;
+        }
+
+        // 计算控制限
+        function calculateControlLimits(data, chartType, controlLimitFactor) {
+            const stats = {};
+            
+            if (chartType === 'xbar-R') {
+                // 计算均值图控制限
+                const means = data.map(d => d.mean);
+                const meanOfMeans = means.reduce((sum, val) => sum + val, 0) / means.length;
+                
+                const ranges = data.map(d => d.range);
+                const meanOfRanges = ranges.reduce((sum, val) => sum + val, 0) / ranges.length;
+                
+                // 使用D2因子计算标准差（对于5个子组的样本，n=5，D2=2.326）
+                const sigma = meanOfRanges / 2.326;
+                
+                // 计算控制限
+                const UCL = meanOfMeans + (controlLimitFactor * sigma / Math.sqrt(data[0].values.length));
+                const LCL = meanOfMeans - (controlLimitFactor * sigma / Math.sqrt(data[0].values.length));
+                
+                // 计算极差图控制限
+                const UCLr = meanOfRanges * 2.114; // 对于n=5
+                const LCLr = meanOfRanges * 0; // 对于n=5
+                
+                stats = {
+                    mean: meanOfMeans,
+                    UCL: UCL,
+                    LCL: LCL,
+                    UCLr: UCLr,
+                    LCLr: LCLr,
+                    sigma: sigma,
+                    cv: sigma / meanOfMeans,
+                    stability: '计算中...'
+                };
+                
+            } else if (chartType === 'p-chart') {
+                // P图控制限
+                const proportions = data.map(d => d.proportion);
+                const meanProportion = proportions.reduce((sum, val) => sum + val, 0) / proportions.length;
+                
+                const avgSampleSize = data.reduce((sum, d) => sum + d.sampleSize, 0) / data.length;
+                
+                // 计算控制限
+                const UCL = meanProportion + controlLimitFactor * Math.sqrt((meanProportion * (1 - meanProportion)) / avgSampleSize);
+                const LCL = Math.max(0, meanProportion - controlLimitFactor * Math.sqrt((meanProportion * (1 - meanProportion)) / avgSampleSize));
+                
+                stats = {
+                    mean: meanProportion,
+                    UCL: UCL,
+                    LCL: LCL,
+                    sigma: Math.sqrt(meanProportion * (1 - meanProportion)),
+                    cv: Math.sqrt(meanProportion * (1 - meanProportion)) / meanProportion,
+                    stability: '计算中...'
+                };
+                
+            } else if (chartType === 'c-chart') {
+                // C图控制限
+                const defects = data.map(d => d.defects);
+                const meanDefects = defects.reduce((sum, val) => sum + val, 0) / defects.length;
+                
+                // 计算控制限
+                const UCL = meanDefects + controlLimitFactor * Math.sqrt(meanDefects);
+                const LCL = Math.max(0, meanDefects - controlLimitFactor * Math.sqrt(meanDefects));
+                
+                stats = {
+                    mean: meanDefects,
+                    UCL: UCL,
+                    LCL: LCL,
+                    sigma: Math.sqrt(meanDefects),
+                    cv: Math.sqrt(meanDefects) / meanDefects,
+                    stability: '计算中...'
+                };
+                
+            } else if (chartType === 'u-chart') {
+                // U图控制限
+                const defectsPerUnit = data.map(d => d.defectsPerUnit);
+                const meanDefectsPerUnit = defectsPerUnit.reduce((sum, val) => sum + val, 0) / defectsPerUnit.length;
+                
+                const avgUnits = data.reduce((sum, d) => sum + d.units, 0) / data.length;
+                
+                // 计算控制限
+                const UCL = meanDefectsPerUnit + controlLimitFactor * Math.sqrt(meanDefectsPerUnit / avgUnits);
+                const LCL = Math.max(0, meanDefectsPerUnit - controlLimitFactor * Math.sqrt(meanDefectsPerUnit / avgUnits));
+                
+                stats = {
+                    mean: meanDefectsPerUnit,
+                    UCL: UCL,
+                    LCL: LCL,
+                    sigma: Math.sqrt(meanDefectsPerUnit / avgUnits),
+                    cv: Math.sqrt(meanDefectsPerUnit / avgUnits) / meanDefectsPerUnit,
+                    stability: '计算中...'
+                };
+            }
+            
+            // 分析稳定性
+            stats.stability = analyzeStability(data, stats, chartType);
+            
+            return stats;
+        }
+
+        // 分析过程稳定性
+        function analyzeStability(data, stats, chartType) {
+            let outliers = 0;
+            let trends = 0;
+            let otherIssues = 0;
+            
+            // 获取数据点
+            let points = [];
+            if (chartType === 'xbar-r') {
+                points = data.map(d => d.mean);
+            } else if (chartType === 'p-chart') {
+                points = data.map(d => d.proportion);
+            } else if (chartType === 'c-chart') {
+                points = data.map(d => d.defects);
+            } else if (chartType === 'u-chart') {
+                points = data.map(d => d.defectsPerUnit);
+            }
+            
+            // 检查超出控制限的点
+            points.forEach(point => {
+                if (point > stats.UCL || point < stats.LCL) {
+                    outliers++;
+                }
+            });
+            
+            // 检查趋势
+            let increasing = 0;
+            let decreasing = 0;
+            
+            for (let i = 1; i < points.length; i++) {
+                if (points[i] > points[i-1]) {
+                    increasing++;
+                    decreasing = 0;
+                } else if (points[i] < points[i-1]) {
+                    decreasing++;
+                    increasing = 0;
+                } else {
+                    increasing = 0;
+                    decreasing = 0;
+                }
+                
+                if (increasing >= 6 || decreasing >= 6) {
+                    trends++;
+                    break;
+                }
+            }
+            
+            // 检查其他模式
+            let sameSide = 0;
+            for (let i = 1; i < points.length; i++) {
+                if ((points[i] > stats.mean && points[i-1] > stats.mean) || 
+                    (points[i] < stats.mean && points[i-1] < stats.mean)) {
+                    sameSide++;
+                } else {
+                    sameSide = 0;
+                }
+                
+                if (sameSide >= 8) {
+                    otherIssues++;
+                    break;
+                }
+            }
+            
+            const totalPoints = points.length;
+            const outlierRatio = outliers / totalPoints;
+            
+            // 根据异常点比例评估稳定性
+            let stability = '稳定';
+            if (outlierRatio > 0.05 || outliers > 0) {
+                stability = '不稳定';
+            } else if (outlierRatio > 0.02) {
+                stability = '基本稳定';
+            }
+            
+            return stability;
+        }
+
+        // 显示结果
+        function displayResults(stats, data, chartType) {
+            // 显示基本统计信息
+            document.getElementById('result-group-count').textContent = data.length;
+            document.getElementById('result-center-line').textContent = stats.mean.toFixed(4);
+            document.getElementById('result-ucl').textContent = stats.UCL.toFixed(4);
+            document.getElementById('result-lcl').textContent = stats.LCL.toFixed(4);
+            document.getElementById('result-mean').textContent = stats.mean.toFixed(4);
+            document.getElementById('result-std').textContent = stats.sigma.toFixed(4);
+            document.getElementById('result-cv').textContent = stats.cv.toFixed(4);
+            document.getElementById('result-stability').textContent = stats.stability;
+            
+            // 统计异常点
+            let outliers = 0;
+            let trends = 0;
+            let otherIssues = 0;
+            
+            // 获取数据点
+            let points = [];
+            if (chartType === 'xbar-r') {
+                points = data.map(d => d.mean);
+            } else if (chartType === 'p-chart') {
+                points = data.map(d => d.proportion);
+            } else if (chartType === 'c-chart') {
+                points = data.map(d => d.defects);
+            } else if (chartType === 'u-chart') {
+                points = data.map(d => d.defectsPerUnit);
+            }
+            
+            // 检查超出控制限的点
+            points.forEach(point => {
+                if (point > stats.UCL || point < stats.LCL) {
+                    outliers++;
+                }
+            });
+            
+            // 检查趋势
+            let increasing = 0;
+            let decreasing = 0;
+            
+            for (let i = 1; i < points.length; i++) {
+                if (points[i] > points[i-1]) {
+                    increasing++;
+                    decreasing = 0;
+                } else if (points[i] < points[i-1]) {
+                    decreasing++;
+                    increasing = 0;
+                } else {
+                    increasing = 0;
+                    decreasing = 0;
+                }
+                
+                if (increasing >= 6 || decreasing >= 6) {
+                    trends++;
+                    break;
+                }
+            }
+            
+            // 检查其他模式
+            let sameSide = 0;
+            for (let i = 1; i < points.length; i++) {
+                if ((points[i] > stats.mean && points[i-1] > stats.mean) || 
+                    (points[i] < stats.mean && points[i-1] < stats.mean)) {
+                    sameSide++;
+                } else {
+                    sameSide = 0;
+                }
+                
+                if (sameSide >= 8) {
+                    otherIssues++;
+                    break;
+                }
+            }
+            
+            const totalPoints = points.length;
+            const outlierRatio = (outliers / totalPoints).toFixed(4);
+            
+            document.getElementById('result-outliers').textContent = outliers;
+            document.getElementById('result-trend').textContent = trends;
+            document.getElementById('result-other-issues').textContent = otherIssues;
+            document.getElementById('result-outlier-ratio').textContent = outlierRatio;
+        }
+
+        // 绘制控制图
+        function drawControlChart(data, stats, chartType) {
+            const ctx = document.getElementById('control-chart').getContext('2d');
+            
+            if (controlChart) {
+                controlChart.destroy();
+            }
+            
+            // 准备数据
+            let labels, values, title;
+            
+            if (chartType === 'xbar-r') {
+                labels = data.map(d => d.groupNumber);
+                values = data.map(d => d.mean);
+                title = 'Xbar图（均值控制图）';
+            } else if (chartType === 'p-chart') {
+                labels = data.map(d => d.sampleNumber);
+                values = data.map(d => d.proportion);
+                title = 'P图（不合格品率控制图）';
+            } else if (chartType === 'c-chart') {
+                labels = data.map(d => d.time);
+                values = data.map(d => d.defects);
+                title = 'C图（缺陷数控制图）';
+            } else if (chartType === 'u-chart') {
+                labels = data.map(d => d.time);
+                values = data.map(d => d.defectsPerUnit);
+                title = 'U图（单位缺陷数控制图）';
+            }
+            
+            // 创建控制限线数据
+            const UCLData = values.map(() => stats.UCL);
+            const CLData = values.map(() => stats.mean);
+            const LCLData = values.map(() => stats.LCL);
+            
+            controlChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '数据点',
+                            data: values,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                            pointRadius: 4,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'UCL',
+                            data: UCLData,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        },
+                        {
+                            label: 'CL',
+                            data: CLData,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        },
+                        {
+                            label: 'LCL',
+                            data: LCLData,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                        title: {
+                            display: true,
+                            text: title
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // 绘制过程能力图
+        function drawCapabilityChart(data, stats, chartType) {
+            const ctx = document.getElementById('capability-chart').getContext('2d');
+            
+            if (capabilityChart) {
+                capabilityChart.destroy();
+            }
+            
+            // 获取数据
+            let values = [];
+            if (chartType === 'xbar-r') {
+                values = data.map(d => d.mean);
+            } else if (chartType === 'p-chart') {
+                values = data.map(d => d.proportion);
+            } else if (chartType === 'c-chart') {
+                values = data.map(d => d.defects);
+            } else if (chartType === 'u-chart') {
+                values = data.map(d => d.defectsPerUnit);
+            }
+            
+            // 计算直方图数据
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+            const range = max - min;
+            const binCount = Math.min(10, Math.max(5, Math.round(Math.sqrt(values.length))));
+            const binWidth = range / binCount;
+            
+            const bins = Array(binCount).fill(0);
+            values.forEach(value => {
+                const binIndex = Math.min(Math.floor((value - min) / binWidth), binCount - 1);
+                bins[binIndex]++;
+            });
+            
+            const xAxisLabels = Array.from({length: binCount}, (_, i) => {
+                const start = min + i * binWidth;
+                const end = start + binWidth;
+                return `${start.toFixed(2)}-${end.toFixed(2)}`;
+            });
+            
+            // 生成正态分布曲线数据
+            const curvePointCount = 100;
+            const curveX = Array.from({length: curvePointCount}, (_, i) => {
+                return min + (max - min) * i / (curvePointCount - 1);
+            });
+            
+            const normalValues = curveX.map(x => {
+                const exponent = -0.5 * Math.pow((x - stats.mean) / stats.sigma, 2);
+                return (1 / (stats.sigma * Math.sqrt(2 * Math.PI))) * Math.exp(exponent);
+            });
+            
+            const maxBinHeight = Math.max(...bins);
+            const maxNormalValue = Math.max(...normalValues);
+            const curveY = normalValues.map(value => (value / maxNormalValue) * maxBinHeight * 1.1);
+            
+            capabilityChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: xAxisLabels,
+                    datasets: [
+                        {
+                            label: '数据分布',
+                            data: bins,
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '正态分布曲线',
+                            data: curveY,
+                            type: 'line',
+                            backgroundColor: 'transparent',
+                            borderColor: 'rgba(255, 0, 0, 0.8)',
+                            borderWidth: 2,
+                            fill: false,
+                            pointRadius: 0,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'CL',
+                            data: Array.from({length: binCount}, () => {
+                                // 找到最接近均值的bin
+                                const binStart = min + Math.floor((stats.mean - min) / binWidth) * binWidth;
+                                const binIndex = Math.floor((stats.mean - min) / binWidth);
+                                if (binIndex >= 0 && binIndex < binCount) {
+                                    return maxBinHeight * 0.8;
+                                }
+                                return 0;
+                            }),
+                            type: 'line',
+                            backgroundColor: 'transparent',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderDash: [5, 5],
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                        title: {
+                            display: true,
+                            text: `正态分布直方图（μ=${stats.mean.toFixed(4)}, σ=${stats.sigma.toFixed(4)}）`
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // 清空输入
+        function clearInputs() {
+            document.getElementById('data-input').value = '';
+            document.getElementById('results-section').style.display = 'none';
+            if (controlChart) {
+                controlChart.destroy();
+                controlChart = null;
+            }
+            if (capabilityChart) {
+                capabilityChart.destroy();
+                capabilityChart = null;
+            }
+        }
+
+        // 导出结果
+        function exportResults() {
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection.style.display === 'none') {
+                alert('请先生成控制图');
+                return;
+            }
+
+            // 获取结果数据
+            const groupCount = document.getElementById('result-group-count').textContent;
+            const centerLine = document.getElementById('result-center-line').textContent;
+            const UCL = document.getElementById('result-ucl').textContent;
+            const LCL = document.getElementById('result-lcl').textContent;
+            const mean = document.getElementById('result-mean').textContent;
+            const std = document.getElementById('result-std').textContent;
+            const cv = document.getElementById('result-cv').textContent;
+            const stability = document.getElementById('result-stability').textContent;
+            const outliers = document.getElementById('result-outliers').textContent;
+            const trend = document.getElementById('result-trend').textContent;
+            const otherIssues = document.getElementById('result-other-issues').textContent;
+            const outlierRatio = document.getElementById('result-outlier-ratio').textContent;
+
+            // 创建CSV内容
+            let csvContent = '指标,数值\n';
+            csvContent += `样本组数,${groupCount}\n`;
+            csvContent += `中心线 (CL),${centerLine}\n`;
+            csvContent += `上控制限 (UCL),${UCL}\n`;
+            csvContent += `下控制限 (LCL),${LCL}\n`;
+            csvContent += `过程平均值 (μ),${mean}\n`;
+            csvContent += `过程标准差 (σ),${std}\n`;
+            csvContent += `过程变异系数,${cv}\n`;
+            csvContent += `过程稳定性,${stability}\n`;
+            csvContent += `超出控制限点,${outliers}\n`;
+            csvContent += `趋势点,${trend}\n`;
+            csvContent += `其他异常点,${otherIssues}\n`;
+            csvContent += `异常点比例,${outlierRatio}\n`;
+
+            // 下载CSV文件
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'SPC控制图分析结果.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>

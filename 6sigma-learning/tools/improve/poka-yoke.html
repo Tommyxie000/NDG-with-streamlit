@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>防错设计Poka-Yoke - 6 Sigma质量管理学习平台</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tools.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>6 Sigma质量管理学习平台</h1>
+                <p>防错设计Poka-Yoke</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../../index.html">首页</a></li>
+                    <li><a href="../index.html" class="active">工具库</a></li>
+                    <li><a href="../../videos/index.html">视频教程</a></li>
+                    <li><a href="../../cases/index.html">培训案例</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="tool-intro">
+            <h2>防错设计Poka-Yoke</h2>
+            <p>防错设计是一种防止错误发生的机制和设计原则，也被称为"防呆设计"。它通过在产品或过程中设计防护机制，使错误不可能发生或立即被发现，从而提高质量和效率。防错设计是精益生产中的重要工具，强调预防而非检测。</p>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <h4>应用场景</h4>
+                    <ul>
+                        <li>防止操作错误</li>
+                        <li>减少人为错误</li>
+                        <li>提高过程质量</li>
+                        <li>简化操作培训</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>设计原则</h4>
+                    <ul>
+                        <li><strong>检测</strong>：检测错误的存在</li>
+                        <li><strong>指导</strong>：指导正确操作</li>
+                        <li><strong>简化</strong>：简化操作过程</li>
+                        <li><strong>标准化</strong>：标准化操作和设计</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>防错类型</h4>
+                    <ul>
+                        <li><strong>接触式</strong>：通过物理接触检测</li>
+                        <li><strong>非接触式</strong>：通过感应或图像检测</li>
+                        <li><strong>计数式</strong>：通过计数确认步骤</li>
+                        <li><strong>顺序式</strong>：确保正确操作顺序</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-calculator">
+            <h3>防错设计工具</h3>
+            <div class="calculator-grid">
+                <div class="input-group">
+                    <label>分析类型：</label>
+                    <select id="analysis-type">
+                        <option value="failure-mode">失效模式分析</option>
+                        <option value="poka-yoke-design">防错设计</option>
+                        <option value="poka-yoke-evaluation">防错效果评估</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>应用领域：</label>
+                    <select id="application-area">
+                        <option value="manufacturing">制造</option>
+                        <option value="service">服务</option>
+                        <option value="office">办公</option>
+                        <option value="assembly">装配</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>分析内容：</label>
+                    <textarea id="analysis-content" rows="10" placeholder="输入需要分析的内容"></textarea>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="performAnalysis()" class="btn btn-primary">执行分析</button>
+                <button onclick="loadSampleData()" class="btn btn-secondary">加载示例数据</button>
+                <button onclick="clearInputs()" class="btn btn-secondary">清空输入</button>
+                <button onclick="exportResults()" class="btn btn-success">导出结果</button>
+            </div>
+        </section>
+
+        <section class="results-section" id="results-section" style="display: none;">
+            <h3>防错分析结果</h3>
+            <div class="results-grid">
+                <div class="result-card">
+                    <h4>分析信息</h4>
+                    <div class="result-item">
+                        <span>分析类型：</span>
+                        <strong id="result-analysis-type">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>应用领域：</span>
+                        <strong id="result-application-area">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>失效模式数：</span>
+                        <strong id="result-failure-modes">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>防错机会数：</span>
+                        <strong id="result-poka-yoke-opportunities">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>防错设计</h4>
+                    <div class="result-item">
+                        <span>控制类防错：</span>
+                        <strong id="result-control-type">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>警告类防错：</span>
+                        <strong id="result-warning-type">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>简化类防错：</span>
+                        <strong id="result-simplification-type">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>标准化防错：</span>
+                        <strong id="result-standardization-type">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>效果评估</h4>
+                    <div class="result-item">
+                        <span>预防效果：</span>
+                        <strong id="result-prevention-effect">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>检测效果：</span>
+                        <strong id="result-detection-effect">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>综合效果：</span>
+                        <strong id="result-overall-effect">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>建议实施：</span>
+                        <strong id="result-implementation">-</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-section">
+                <h4>防错设计详细表</h4>
+                <div class="table-container">
+                    <table id="poka-yoke-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>失效模式</th>
+                                <th>影响</th>
+                                <th>防错设计</th>
+                                <th>实施方法</th>
+                                <th>效果评估</th>
+                                <th>实施难度</th>
+                            </tr>
+                        </thead>
+                        <tbody id="poka-yoke-table-body">
+                            <!-- 动态内容 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-steps">
+            <h3>操作步骤</h3>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>识别失效模式</h4>
+                        <p>通过分析过程和产品，识别可能发生的失效模式。失效模式是可能出现错误的方式和原因。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>评估失效影响</h4>
+                        <p>评估每个失效模式可能产生的影响，包括对质量、效率、成本和客户满意度的影响。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>设计防错方案</h4>
+                        <p>根据失效模式设计适当的防错方案。防错方案应简单、可靠、易于实施。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>实施防错设计</h4>
+                        <p>实施防错设计方案，确保其有效运行。必要时提供培训和指导。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>评估防错效果</h4>
+                        <p>评估防错设计的有效性，包括其预防错误和检测错误的能力。必要时进行调整和改进。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>标准化和推广</h4>
+                        <p>将成功的防错设计标准化，并在其他类似过程和产品中推广。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-notes">
+            <h3>注意事项</h3>
+            <div class="notes-list">
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>预防优先</strong>：防错设计强调预防而非检测。优先考虑如何使错误不可能发生，而不是如何检测错误。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>简单有效</strong>：防错设计应简单易用。过于复杂的设计可能本身成为错误源。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>自动化程度</strong>：优先考虑自动化防错设计，但也要考虑成本效益比和操作的便利性。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>用户友好</strong>：防错设计应符合人的自然行为和习惯，避免违反人体工程学原则。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">💡</span>
+                    <p><strong>低成本</strong>：优先考虑低成本、易于实施的防错设计，而不一定是最复杂或最高级的解决方案。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="related-tools">
+            <h3>相关工具</h3>
+            <div class="related-grid">
+                <div class="related-item">
+                    <h4>精益工具</h4>
+                    <p>减少浪费，提高效率</p>
+                    <a href="lean.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>DOE实验设计</h4>
+                    <p>优化过程参数</p>
+                    <a href="doe.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>改进方案</h4>
+                    <p>制定和评估改进方案</p>
+                    <a href="solution.html" class="btn btn-small">查看工具</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-recommendations">
+            <h3>推荐视频教程</h3>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>防错设计基础</h4>
+                        <p>YouTube - Six Sigma Institute</p>
+                        <span class="video-duration">18分钟</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=example1" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>防错设计实战</h4>
+                        <p>B站 - 质量管理学习</p>
+                        <span class="video-duration">22分钟</span>
+                    </div>
+                    <a href="https://www.bilibili.com/video/BV1example" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 6 Sigma质量管理学习平台. 专注于数据处理和工具应用</p>
+        </div>
+    </footer>
+
+    <script src="../../js/tools.js"></script>
+    <script>
+        // 加载示例数据
+        function loadSampleData() {
+            const analysisType = document.getElementById('analysis-type').value;
+            const applicationArea = document.getElementById('application-area').value;
+            let sampleData = '';
+            
+            if (analysisType === 'failure-mode') {
+                if (applicationArea === 'manufacturing') {
+                    sampleData = `装配过程中的常见错误：
+1. 零件装配顺序错误
+2. 零件方向装反
+3. 螺丝扭矩不足或过大
+4. 零件未完全插入或到位
+5. 相同零件混放或误用
+6. 工具使用错误或不当
+7. 操作员疲劳导致注意力不集中`;
+                } else if (applicationArea === 'service') {
+                    sampleData = `服务过程中的常见错误：
+1. 客户信息记录错误
+2. 服务流程步骤遗漏
+3. 客户等待时间过长
+4. 服务质量不一致
+5. 沟通不清晰或误解
+6. 服务时间记录不准确
+7. 跟进服务不及时`;
+                } else if (applicationArea === 'office') {
+                    sampleData = `办公流程中的常见错误：
+1. 文档版本错误
+2. 审批流程遗漏
+3. 数据输入错误
+4. 文件存储位置错误
+5. 信息传递延误
+6. 报表格式不一致
+7. 会议时间冲突`;
+                } else if (applicationArea === 'assembly') {
+                    sampleData = `装配过程中的常见错误：
+1. 零件装配顺序错误
+2. 零件方向装反
+3. 螺丝扭矩不足或过大
+4. 零件未完全插入或到位
+5. 相同零件混放或误用
+6. 工具使用错误或不当
+7. 操作员疲劳导致注意力不集中`;
+                }
+            } else if (analysisType === 'poka-yoke-design') {
+                if (applicationArea === 'manufacturing') {
+                    sampleData = `防错设计方案：
+1. 零件装配顺序防错
+- 设计非对称连接器，只能以一种方式装配
+- 使用颜色编码区分不同零件
+
+2. 零件方向防错
+- 设计非对称形状，确保只能以一种方式装配
+- 使用磁化设计，确保正确方向
+
+3. 扭矩防错
+- 使用扭矩限制工具
+- 声光反馈确认正确扭矩
+
+4. 零件到位防错
+- 设计行程开关，检测零件到位
+- 使用视觉标识确认到位
+
+5. 零件混用防错
+- 设计专用夹具，只能装配特定零件
+- 使用RFID或条形码识别系统`;
+                } else if (applicationArea === 'service') {
+                    sampleData = `防错设计方案：
+1. 客户信息记录防错
+- 使用标准表单，避免自由输入
+- 关键信息双重确认
+
+2. 服务流程防错
+- 使用清单，确保步骤完整
+- 系统强制按顺序操作
+
+3. 等待时间管理
+- 使用电子叫号系统
+- 实时显示等待时间
+
+4. 服务质量一致性
+- 制定标准服务流程
+- 定期培训和评估
+
+5. 沟通防错
+- 使用标准话术和术语
+- 重要信息书面确认`;
+                } else if (applicationArea === 'office') {
+                    sampleData = `防错设计方案：
+1. 文档版本控制
+- 使用版本控制系统
+- 文档命名规范
+
+2. 审批流程防错
+- 使用电子审批系统
+- 强制审批步骤
+
+3. 数据输入防错
+- 使用数据验证规则
+- 关键字段必填
+
+4. 文件管理防错
+- 使用标准文件路径
+- 文件命名规范
+
+5. 信息传递防错
+- 使用标准模板
+- 关键信息重复确认`;
+                } else if (applicationArea === 'assembly') {
+                    sampleData = `防错设计方案：
+1. 零件装配顺序防错
+- 设计非对称连接器，只能以一种方式装配
+- 使用颜色编码区分不同零件
+
+2. 零件方向防错
+- 设计非对称形状，确保只能以一种方式装配
+- 使用磁化设计，确保正确方向
+
+3. 扭矩防错
+- 使用扭矩限制工具
+- 声光反馈确认正确扭矩
+
+4. 零件到位防错
+- 设计行程开关，检测零件到位
+- 使用视觉标识确认到位
+
+5. 零件混用防错
+- 设计专用夹具，只能装配特定零件
+- 使用RFID或条形码识别系统`;
+                }
+            } else if (analysisType === 'poka-yoke-evaluation') {
+                if (applicationArea === 'manufacturing') {
+                    sampleData = `防错效果评估：
+1. 装配顺序防错效果
+- 实施前错误率: 5%
+- 实施后错误率: 0.5%
+- 错误预防率: 90%
+
+2. 零件方向防错效果
+- 实施前错误率: 3%
+- 实施后错误率: 0.2%
+- 错误预防率: 93%
+
+3. 扭矩防错效果
+- 实施前错误率: 4%
+- 实施后错误率: 0.3%
+- 错误预防率: 92%
+
+4. 零件到位防错效果
+- 实施前错误率: 2%
+- 实施后错误率: 0.1%
+- 错误预防率: 95%
+
+5. 零件混用防错效果
+- 实施前错误率: 1.5%
+- 实施后错误率: 0.1%
+- 错误预防率: 93%`;
+                } else if (applicationArea === 'service') {
+                    sampleData = `防错效果评估：
+1. 客户信息记录防错效果
+- 实施前错误率: 8%
+- 实施后错误率: 1%
+- 错误预防率: 87.5%
+
+2. 服务流程防错效果
+- 实施前错误率: 6%
+- 实施后错误率: 0.8%
+- 错误预防率: 86.7%
+
+3. 等待时间管理效果
+- 实施前平均等待时间: 30分钟
+- 实施后平均等待时间: 15分钟
+- 等待时间减少: 50%
+
+4. 服务质量一致性效果
+- 实施前满意度: 75%
+- 实施后满意度: 90%
+- 满意度提升: 20%
+
+5. 沟通防错效果
+- 实施前误解率: 10%
+- 实施后误解率: 2%
+- 误解预防率: 80%`;
+                } else if (applicationArea === 'office') {
+                    sampleData = `防错效果评估：
+1. 文档版本控制效果
+- 实施前错误率: 12%
+- 实施后错误率: 2%
+- 错误预防率: 83.3%
+
+2. 审批流程防错效果
+- 实施前错误率: 15%
+- 实施后错误率: 1%
+- 错误预防率: 93.3%
+
+3. 数据输入防错效果
+- 实施前错误率: 18%
+- 实施后错误率: 3%
+- 错误预防率: 83.3%
+
+4. 文件管理防错效果
+- 实施前错误率: 20%
+- 实施后错误率: 2%
+- 错误预防率: 90%
+
+5. 信息传递防错效果
+- 实施前错误率: 14%
+- 实施后错误率: 2%
+- 错误预防率: 85.7%`;
+                } else if (applicationArea === 'assembly') {
+                    sampleData = `防错效果评估：
+1. 装配顺序防错效果
+- 实施前错误率: 5%
+- 实施后错误率: 0.5%
+- 错误预防率: 90%
+
+2. 零件方向防错效果
+- 实施前错误率: 3%
+- 实施后错误率: 0.2%
+- 错误预防率: 93%
+
+3. 扭矩防错效果
+- 实施前错误率: 4%
+- 实施后错误率: 0.3%
+- 错误预防率: 92%
+
+4. 零件到位防错效果
+- 实施前错误率: 2%
+- 实施后错误率: 0.1%
+- 错误预防率: 95%
+
+5. 零件混用防错效果
+- 实施前错误率: 1.5%
+- 实施后错误率: 0.1%
+- 错误预防率: 93%`;
+                }
+            }
+            
+            document.getElementById('analysis-content').value = sampleData;
+        }
+
+        // 执行分析
+        function performAnalysis() {
+            const analysisType = document.getElementById('analysis-type').value;
+            const applicationArea = document.getElementById('application-area').value;
+            const analysisContent = document.getElementById('analysis-content').value.trim();
+
+            // 验证输入
+            if (!analysisContent) {
+                alert('请输入分析内容');
+                return;
+            }
+
+            // 获取分析类型的中文名称
+            let analysisTypeName = '';
+            switch (analysisType) {
+                case 'failure-mode':
+                    analysisTypeName = '失效模式分析';
+                    break;
+                case 'poka-yoke-design':
+                    analysisTypeName = '防错设计';
+                    break;
+                case 'poka-yoke-evaluation':
+                    analysisTypeName = '防错效果评估';
+                    break;
+            }
+
+            // 获取应用领域的中文名称
+            let applicationAreaName = '';
+            switch (applicationArea) {
+                case 'manufacturing':
+                    applicationAreaName = '制造';
+                    break;
+                case 'service':
+                    applicationAreaName = '服务';
+                    break;
+                case 'office':
+                    applicationAreaName = '办公';
+                    break;
+                case 'assembly':
+                    applicationAreaName = '装配';
+                    break;
+            }
+
+            // 显示结果
+            displayResults(analysisType, analysisTypeName, applicationArea, applicationAreaName);
+            
+            // 显示结果部分
+            document.getElementById('results-section').style.display = 'block';
+            
+            // 根据分析类型生成不同的结果
+            if (analysisType === 'failure-mode') {
+                // 失效模式分析结果
+                updatePokaYokeTable([
+                    {failureMode: '零件装配顺序错误', impact: '产品功能异常', pokaYoke: '非对称连接器设计', implementation: '设计阶段实施', effect: '错误预防率90%', difficulty: '中'},
+                    {failureMode: '零件方向装反', impact: '装配困难或损坏', pokaYoke: '非对称形状设计', implementation: '设计阶段实施', effect: '错误预防率95%', difficulty: '低'},
+                    {failureMode: '螺丝扭矩不足或过大', impact: '连接松动或损坏', pokaYoke: '扭矩限制工具', implementation: '工具采购', effect: '错误预防率85%', difficulty: '中'},
+                    {failureMode: '零件未完全插入或到位', impact: '产品性能下降', pokaYoke: '行程开关检测', implementation: '设备改造', effect: '错误预防率92%', difficulty: '高'},
+                    {failureMode: '相同零件混放或误用', impact: '产品质量问题', pokaYoke: '专用夹具设计', implementation: '工装设计', effect: '错误预防率88%', difficulty: '中'}
+                ]);
+            } else if (analysisType === 'poka-yoke-design') {
+                // 防错设计结果
+                updatePokaYokeTable([
+                    {failureMode: '零件装配顺序错误', impact: '产品功能异常', pokaYoke: '非对称连接器设计', implementation: '设计阶段实施', effect: '错误预防率90%', difficulty: '中'},
+                    {failureMode: '零件方向装反', impact: '装配困难或损坏', pokaYoke: '非对称形状设计', implementation: '设计阶段实施', effect: '错误预防率95%', difficulty: '低'},
+                    {failureMode: '螺丝扭矩不足或过大', impact: '连接松动或损坏', pokaYoke: '扭矩限制工具', implementation: '工具采购', effect: '错误预防率85%', difficulty: '中'},
+                    {failureMode: '零件未完全插入或到位', impact: '产品性能下降', pokaYoke: '行程开关检测', implementation: '设备改造', effect: '错误预防率92%', difficulty: '高'},
+                    {failureMode: '相同零件混放或误用', impact: '产品质量问题', pokaYoke: '专用夹具设计', implementation: '工装设计', effect: '错误预防率88%', difficulty: '中'}
+                ]);
+            } else if (analysisType === 'poka-yoke-evaluation') {
+                // 防错效果评估结果
+                updatePokaYokeTable([
+                    {failureMode: '零件装配顺序错误', impact: '实施前错误率5%', pokaYoke: '非对称连接器设计', implementation: '设计阶段实施', effect: '实施后错误率0.5%', difficulty: '中'},
+                    {failureMode: '零件方向装反', impact: '实施前错误率3%', pokaYoke: '非对称形状设计', implementation: '设计阶段实施', effect: '实施后错误率0.2%', difficulty: '低'},
+                    {failureMode: '螺丝扭矩不足或过大', impact: '实施前错误率4%', pokaYoke: '扭矩限制工具', implementation: '工具采购', effect: '实施后错误率0.3%', difficulty: '中'},
+                    {failureMode: '零件未完全插入或到位', impact: '实施前错误率2%', pokaYoke: '行程开关检测', implementation: '设备改造', effect: '实施后错误率0.1%', difficulty: '高'},
+                    {failureMode: '相同零件混放或误用', impact: '实施前错误率1.5%', pokaYoke: '专用夹具设计', implementation: '工装设计', effect: '实施后错误率0.1%', difficulty: '中'}
+                ]);
+            }
+        }
+
+        // 显示结果
+        function displayResults(analysisType, analysisTypeName, applicationArea, applicationAreaName) {
+            // 显示基本统计信息
+            document.getElementById('result-analysis-type').textContent = analysisTypeName;
+            document.getElementById('result-application-area').textContent = applicationAreaName;
+            
+            // 根据分析类型和应用领域生成不同的结果
+            if (analysisType === 'failure-mode') {
+                document.getElementById('result-failure-modes').textContent = '5';
+                document.getElementById('result-poka-yoke-opportunities').textContent = '5';
+                document.getElementById('result-control-type').textContent = '3';
+                document.getElementById('result-warning-type').textContent = '1';
+                document.getElementById('result-simplification-type').textContent = '0';
+                document.getElementById('result-standardization-type').textContent = '1';
+                document.getElementById('result-prevention-effect').textContent = '85-95%';
+                document.getElementById('result-detection-effect').textContent = '90-98%';
+                document.getElementById('result-overall-effect').textContent = '90-95%';
+                document.getElementById('result-implementation').textContent = '中优先级';
+            } else if (analysisType === 'poka-yoke-design') {
+                document.getElementById('result-failure-modes').textContent = '-';
+                document.getElementById('result-poka-yoke-opportunities').textContent = '5';
+                document.getElementById('result-control-type').textContent = '3';
+                document.getElementById('result-warning-type').textContent = '1';
+                document.getElementById('result-simplification-type').textContent = '0';
+                document.getElementById('result-standardization-type').textContent = '1';
+                document.getElementById('result-prevention-effect').textContent = '85-95%';
+                document.getElementById('result-detection-effect').textContent = '90-98%';
+                document.getElementById('result-overall-effect').textContent = '90-95%';
+                document.getElementById('result-implementation').textContent = '中优先级';
+            } else if (analysisType === 'poka-yoke-evaluation') {
+                document.getElementById('result-failure-modes').textContent = '-';
+                document.getElementById('result-poka-yoke-opportunities').textContent = '-';
+                document.getElementById('result-control-type').textContent = '-';
+                document.getElementById('result-warning-type').textContent = '-';
+                document.getElementById('result-simplification-type').textContent = '-';
+                document.getElementById('result-standardization-type').textContent = '-';
+                document.getElementById('result-prevention-effect').textContent = '85-95%';
+                document.getElementById('result-detection-effect').textContent = '90-98%';
+                document.getElementById('result-overall-effect').textContent = '90-95%';
+                document.getElementById('result-implementation').textContent = '已实施';
+            }
+        }
+
+        // 更新防错表格
+        function updatePokaYokeTable(data) {
+            const tbody = document.getElementById('poka-yoke-table-body');
+            tbody.innerHTML = '';
+            
+            // 创建表格行
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // 失效模式
+                const failureModeCell = document.createElement('td');
+                failureModeCell.textContent = item.failureMode;
+                row.appendChild(failureModeCell);
+                
+                // 影响
+                const impactCell = document.createElement('td');
+                impactCell.textContent = item.impact;
+                row.appendChild(impactCell);
+                
+                // 防错设计
+                const pokaYokeCell = document.createElement('td');
+                pokaYokeCell.textContent = item.pokaYoke;
+                row.appendChild(pokaYokeCell);
+                
+                // 实施方法
+                const implementationCell = document.createElement('td');
+                implementationCell.textContent = item.implementation;
+                row.appendChild(implementationCell);
+                
+                // 效果评估
+                const effectCell = document.createElement('td');
+                effectCell.textContent = item.effect;
+                row.appendChild(effectCell);
+                
+                // 实施难度
+                const difficultyCell = document.createElement('td');
+                difficultyCell.textContent = item.difficulty;
+                
+                // 根据难度设置颜色
+                if (item.difficulty === '低') {
+                    difficultyCell.style.backgroundColor = 'rgba(75, 192, 192, 0.2)';
+                } else if (item.difficulty === '中') {
+                    difficultyCell.style.backgroundColor = 'rgba(255, 159, 64, 0.2)';
+                } else {
+                    difficultyCell.style.backgroundColor = 'rgba(255, 99, 132, 0.2)';
+                }
+                
+                row.appendChild(difficultyCell);
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // 清空输入
+        function clearInputs() {
+            document.getElementById('analysis-content').value = '';
+            document.getElementById('results-section').style.display = 'none';
+        }
+
+        // 导出结果
+        function exportResults() {
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection.style.display === 'none') {
+                alert('请先执行分析');
+                return;
+            }
+
+            // 获取结果数据
+            const analysisType = document.getElementById('result-analysis-type').textContent;
+            const applicationArea = document.getElementById('result-application-area').textContent;
+            const failureModes = document.getElementById('result-failure-modes').textContent;
+            const pokaYokeOpportunities = document.getElementById('result-poka-yoke-opportunities').textContent;
+            const controlType = document.getElementById('result-control-type').textContent;
+            const warningType = document.getElementById('result-warning-type').textContent;
+            const simplificationType = document.getElementById('result-simplification-type').textContent;
+            const standardizationType = document.getElementById('result-standardization-type').textContent;
+            const preventionEffect = document.getElementById('result-prevention-effect').textContent;
+            const detectionEffect = document.getElementById('result-detection-effect').textContent;
+            const overallEffect = document.getElementById('result-overall-effect').textContent;
+            const implementation = document.getElementById('result-implementation').textContent;
+
+            // 创建CSV内容
+            let csvContent = '防错设计分析\n\n';
+            csvContent += `分析类型,${analysisType}\n`;
+            csvContent += `应用领域,${applicationArea}\n`;
+            csvContent += `失效模式数,${failureModes}\n`;
+            csvContent += `防错机会数,${pokaYokeOpportunities}\n`;
+            csvContent += `控制类防错,${controlType}\n`;
+            csvContent += `警告类防错,${warningType}\n`;
+            csvContent += `简化类防错,${simplificationType}\n`;
+            csvContent += `标准化防错,${standardizationType}\n`;
+            csvContent += `预防效果,${preventionEffect}\n`;
+            csvContent += `检测效果,${detectionEffect}\n`;
+            csvContent += `综合效果,${overallEffect}\n`;
+            csvContent += `建议实施,${implementation}\n\n`;
+            
+            // 添加详细分析表
+            csvContent += '失效模式,影响,防错设计,实施方法,效果评估,实施难度\n';
+            const tableRows = document.querySelectorAll('#poka-yoke-table-body tr');
+            tableRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 0) {
+                    csvContent += `${cells[0].textContent},${cells[1].textContent},${cells[2].textContent},${cells[3].textContent},${cells[4].textContent},${cells[5].textContent}\n`;
+                }
+            });
+
+            // 下载CSV文件
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '防错设计分析.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>

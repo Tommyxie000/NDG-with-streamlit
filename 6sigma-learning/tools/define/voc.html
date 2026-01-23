@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOC顾客之声收集 - 6 Sigma质量管理学习平台</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tools.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>6 Sigma质量管理学习平台</h1>
+                <p>VOC顾客之声收集</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../../index.html">首页</a></li>
+                    <li><a href="../index.html" class="active">工具库</a></li>
+                    <li><a href="../../videos/index.html">视频教程</a></li>
+                    <li><a href="../../cases/index.html">培训案例</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="tool-intro">
+            <h2>VOC顾客之声收集 (Voice of Customer)</h2>
+            <p>VOC是6 Sigma定义阶段的核心工具，用于系统性地收集、分析和理解客户的需求、期望和反馈。通过收集客户的真实声音，可以确定影响客户满意度的关键因素，为项目定义和优先级排序提供依据。</p>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <h4>应用场景</h4>
+                    <ul>
+                        <li>确定客户需求和期望</li>
+                        <li>识别客户不满和痛点</li>
+                        <li>评估客户满意度和忠诚度</li>
+                        <li>发现创新和改进机会</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>收集方法</h4>
+                    <ul>
+                        <li><strong>访谈</strong>：结构化或非结构化对话</li>
+                        <li><strong>调查</strong>：问卷和在线调查</li>
+                        <li><strong>观察</strong>：客户行为观察</li>
+                        <li><strong>社交媒体</strong>：监测客户在线反馈</li>
+                        <li><strong>投诉数据</strong>：分析客户投诉和建议</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>VOC分析</h4>
+                    <ul>
+                        <li><strong>需求</strong>：客户需要什么</li>
+                        <li><strong>期望</strong>：客户希望达到什么水平</li>
+                        <li><strong>关键因素</strong>：影响满意度的关键点</li>
+                        <li><strong>痛点</strong>：客户不满和抱怨的来源</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-calculator">
+            <h3>VOC收集工具</h3>
+            <div class="calculator-grid">
+                <div class="input-group">
+                    <label>收集方法：</label>
+                    <select id="collection-method">
+                        <option value="interview">访谈</option>
+                        <option value="survey">调查</option>
+                        <option value="observation">观察</option>
+                        <option value="social-media">社交媒体</option>
+                        <option value="complaint-data">投诉数据</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>客户类型：</label>
+                    <input type="text" id="customer-type" placeholder="例如：外部客户、内部客户">
+                </div>
+                <div class="input-group">
+                    <label>客户反馈：</label>
+                    <textarea id="customer-feedback" rows="10" placeholder="输入客户反馈"></textarea>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="analyzeVOC()" class="btn btn-primary">分析VOC</button>
+                <button onclick="loadSampleData()" class="btn btn-secondary">加载示例数据</button>
+                <button onclick="clearInputs()" class="btn btn-secondary">清空输入</button>
+                <button onclick="exportResults()" class="btn btn-success">导出结果</button>
+            </div>
+        </section>
+
+        <section class="results-section" id="results-section" style="display: none;">
+            <h3>VOC分析结果</h3>
+            <div class="results-grid">
+                <div class="result-card">
+                    <h4>收集信息</h4>
+                    <div class="result-item">
+                        <span>收集方法：</span>
+                        <strong id="result-method">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>客户类型：</span>
+                        <strong id="result-customer-type">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>反馈条数：</span>
+                        <strong id="result-feedback-count">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>收集日期：</span>
+                        <strong id="result-date">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>需求分析</h4>
+                    <div class="result-item">
+                        <span>需求总数：</span>
+                        <strong id="result-needs-count">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>期望总数：</span>
+                        <strong id="result-expectations-count">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>关键因素数：</span>
+                        <strong id="result-factors-count">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>痛点数：</span>
+                        <strong id="result-pain-points-count">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>优先级</h4>
+                    <div class="result-item">
+                        <span>高优先级项：</span>
+                        <strong id="result-high-priority">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>中优先级项：</span>
+                        <strong id="result-medium-priority">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>低优先级项：</span>
+                        <strong id="result-low-priority">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>改进建议：</span>
+                        <strong id="result-improvements">-</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-section">
+                <h4>VOC详细分析</h4>
+                <div class="table-container">
+                    <table id="voc-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>类型</th>
+                                <th>内容</th>
+                                <th>重要性</th>
+                                <th>满意度</th>
+                                <th>优先级</th>
+                            </tr>
+                        </thead>
+                        <tbody id="voc-table-body">
+                            <!-- 动态内容 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="table-section">
+                <h4>VOC汇总</h4>
+                <div class="voc-summary">
+                    <div class="voc-category">
+                        <h5>客户需求</h5>
+                        <ul id="needs-summary">
+                            <!-- 动态内容 -->
+                        </ul>
+                    </div>
+                    
+                    <div class="voc-category">
+                        <h5>客户期望</h5>
+                        <ul id="expectations-summary">
+                            <!-- 动态内容 -->
+                        </ul>
+                    </div>
+                    
+                    <div class="voc-category">
+                        <h5>关键因素</h5>
+                        <ul id="factors-summary">
+                            <!-- 动态内容 -->
+                        </ul>
+                    </div>
+                    
+                    <div class="voc-category">
+                        <h5>痛点</h5>
+                        <ul id="pain-points-summary">
+                            <!-- 动态内容 -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-steps">
+            <h3>操作步骤</h3>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>确定收集方法</h4>
+                        <p>根据资源、时间、目标等因素选择最适合的VOC收集方法。不同方法适用于不同类型的信息收集需求。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>识别目标客户</h4>
+                        <p>确定要收集哪些客户群体的意见。客户可以按外部/内部、客户生命周期阶段、市场细分等维度进行分类。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>设计收集工具</h4>
+                        <p>开发适合的访谈指南、问卷、观察表等工具。确保问题设计能够引导客户表达真实需求和期望。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>收集VOC数据</h4>
+                        <p>执行VOC收集计划，确保收集过程客观、全面、准确。记录所有相关信息，包括时间、地点、情境等。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>分析VOC数据</h4>
+                        <p>识别需求、期望、关键因素和痛点，提取共同主题，量化重要性和满意度，评估潜在影响和解决方案的可行性。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>优先级排序和行动计划</h4>
+                        <p>根据分析结果确定项目优先级，识别可快速见效的改进点，制定相应的行动计划和时间表。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-notes">
+            <h3>注意事项</h3>
+            <div class="notes-list">
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>真实反映</strong>：确保收集的VOC真实反映客户观点，避免引导性问题或主观判断。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>多元化视角</strong>：收集不同客户群体的意见，避免只依赖少数意见代表或强势客户的声音。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>行为与态度</strong>：同时关注客户的行为和态度，不仅听他们说什么，也观察他们实际做什么。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>动态更新</strong>：VOC收集是一个持续过程，客户需求和期望会随时间变化，需要定期更新VOC数据。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">💡</span>
+                    <p><strong>行动导向</strong>：VOC收集的最终目的是指导行动，确保VOC分析结果转化为具体的改进措施和项目。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="related-tools">
+            <h3>相关工具</h3>
+            <div class="related-grid">
+                <div class="related-item">
+                    <h4>CTQ树</h4>
+                    <p>将VOC转化为可测量的CTQ</p>
+                    <a href="ctq.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>SIPOC分析</h4>
+                    <p>过程映射和范围界定</p>
+                    <a href="sipoc.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>项目章程</h4>
+                    <p>定义项目目标和范围</p>
+                    <a href="charter.html" class="btn btn-small">查看工具</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-recommendations">
+            <h3>推荐视频教程</h3>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>VOC收集方法</h4>
+                        <p>YouTube - Six Sigma Institute</p>
+                        <span class="video-duration">18分钟</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=example1" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>VOC分析实战</h4>
+                        <p>B站 - 质量管理学习</p>
+                        <span class="video-duration">22分钟</span>
+                    </div>
+                    <a href="https://www.bilibili.com/video/BV1example" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 6 Sigma质量管理学习平台. 专注于数据处理和工具应用</p>
+        </div>
+    </footer>
+
+    <script src="../../js/tools.js"></script>
+    <script>
+        // 加载示例数据
+        function loadSampleData() {
+            const collectionMethod = document.getElementById('collection-method').value;
+            let sampleData = '';
+            
+            if (collectionMethod === 'interview') {
+                document.getElementById('customer-type').value = '外部客户';
+                sampleData = `客户1: "我希望能更快地收到产品"
+客户2: "产品包装有些破损，希望改善"
+客户3: "客服很专业，但是响应时间可以更快一些"
+客户4: "总体满意，但是价格有点高"
+客户5: "产品质量很好，但库存不足经常缺货"
+客户6: "希望能有更多的产品颜色选择"
+客户7: "产品使用说明不够清晰，需要改进"
+客户8: "网站界面有些复杂，导航不够直观"
+客户9: "售后服务很好，会继续支持"
+客户10: "希望能有更多促销活动和优惠`;
+            } else if (collectionMethod === 'survey') {
+                document.getElementById('customer-type').value = '外部客户';
+                sampleData = `客户1: 产品满意度: 4/5, 价格满意度: 3/5, 交付满意度: 2/5
+客户2: 产品满意度: 5/5, 价格满意度: 4/5, 交付满意度: 4/5
+客户3: 产品满意度: 4/5, 价格满意度: 3/5, 交付满意度: 4/5
+客户4: 产品满意度: 3/5, 价格满意度: 2/5, 交付满意度: 3/5
+客户5: 产品满意度: 5/5, 价格满意度: 3/5, 交付满意度: 2/5
+客户6: 产品满意度: 4/5, 价格满意度: 4/5, 交付满意度: 5/5
+客户7: 产品满意度: 3/5, 价格满意度: 4/5, 交付满意度: 4/5
+客户8: 产品满意度: 4/5, 价格满意度: 3/5, 交付满意度: 4/5
+客户9: 产品满意度: 5/5, 价格满意度: 4/5, 交付满意度: 5/5
+客户10: 产品满意度: 4/5, 价格满意度: 3/5, 交付满意度: 4/5`;
+            } else if (collectionMethod === 'observation') {
+                document.getElementById('customer-type').value = '内部客户';
+                sampleData = `观察到的问题1: 员工在寻找产品信息时花费较多时间
+观察到的问题2: 客户在比较不同产品时经常返回上一页面
+观察到的问题3: 客户在提交订单时经常出现操作错误
+观察到的问题4: 客户在支付过程中多次检查订单详情
+观察到的问题5: 客户经常联系客服确认订单状态`;
+            } else if (collectionMethod === 'social-media') {
+                document.getElementById('customer-type').value = '外部客户';
+                sampleData = `客户A在推特上发布: "刚收到产品，很满意，质量不错"
+客户B在Facebook上评论: "这家公司产品不错，但价格有点贵"
+客户C在微博上发表: "产品不错但包装有点破损"
+客户D在Instagram上发布: "推荐这家公司的产品，性价比很高"
+客户E在知乎上回答: "我用过他们公司的产品，总体满意" 
+客户F在推特上抱怨: "等待时间太长希望能改进"
+客户G在Facebook上点赞: "客户服务态度很好"
+客户H在微博上发表: "产品使用说明不够详细" 
+客户I在Instagram上评论: "喜欢新出的产品系列"
+客户J在知乎上提问: "想了解这个产品的详细信息"`;
+            } else if (collectionMethod === 'complaint-data') {
+                document.getElementById('customer-type').value = '外部客户';
+                sampleData = `投诉1: 产品交付延迟3天，影响使用计划
+投诉2: 收到产品时包装破损，产品未受影响但担心运输过程
+投诉3: 客服热线长时间无人接听，等待时间过长
+投诉4: 产品质量不符合宣传内容，颜色偏差较大
+投诉5: 退款申请处理时间超过承诺期限
+投诉6: 产品说明书与实际产品功能不符
+投诉7: 订单信息错误导致产品型号不匹配
+投诉8: 退货流程过于复杂，填写信息过多
+投诉9: 产品在保修期内出现故障但售后服务响应慢
+投诉10: 促销活动规则不清晰，导致客户误解`;
+            }
+            
+            document.getElementById('customer-feedback').value = sampleData;
+        }
+
+        // 分析VOC
+        function analyzeVOC() {
+            const collectionMethod = document.getElementById('collection-method').value;
+            const customerType = document.getElementById('customer-type').value.trim();
+            const customerFeedback = document.getElementById('customer-feedback').value.trim();
+
+            // 验证输入
+            if (!customerType || !customerFeedback) {
+                alert('请填写所有必填项');
+                return;
+            }
+
+            // 获取当前日期
+            const today = new Date();
+            const dateString = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+
+            // 显示结果
+            displayResults(collectionMethod, customerType, customerFeedback, dateString);
+            
+            // 显示结果部分
+            document.getElementById('results-section').style.display = 'block';
+        }
+
+        // 显示结果
+        function displayResults(collectionMethod, customerType, customerFeedback, dateString) {
+            // 获取方法的中文名称
+            let methodName = '';
+            switch (collectionMethod) {
+                case 'interview':
+                    methodName = '访谈';
+                    break;
+                case 'survey':
+                    methodName = '调查';
+                    break;
+                case 'observation':
+                    methodName = '观察';
+                    break;
+                case 'social-media':
+                    methodName = '社交媒体';
+                    break;
+                case 'complaint-data':
+                    methodName = '投诉数据';
+                    break;
+            }
+            
+            // 显示基本统计信息
+            document.getElementById('result-method').textContent = methodName;
+            document.getElementById('result-customer-type').textContent = customerType;
+            document.getElementById('result-date').textContent = dateString;
+            
+            // 计算反馈条数
+            const feedbackCount = customerFeedback.split('\n').filter(line => line.trim() !== '').length;
+            document.getElementById('result-feedback-count').textContent = feedbackCount;
+            
+            // 分析VOC数据
+            const analysis = analyzeCustomerFeedback(customerFeedback);
+            
+            // 显示分析结果
+            document.getElementById('result-needs-count').textContent = analysis.needs.length;
+            document.getElementById('result-expectations-count').textContent = analysis.expectations.length;
+            document.getElementById('result-factors-count').textContent = analysis.factors.length;
+            document.getElementById('result-pain-points-count').textContent = analysis.painPoints.length;
+            
+            // 统计优先级
+            const highPriority = analysis.vocItems.filter(item => item.priority === '高').length;
+            const mediumPriority = analysis.vocItems.filter(item => item.priority === '中').length;
+            const lowPriority = analysis.vocItems.filter(item => item.priority === '低').length;
+            
+            document.getElementById('result-high-priority').textContent = highPriority;
+            document.getElementById('result-medium-priority').textContent = mediumPriority;
+            document.getElementById('result-low-priority').textContent = lowPriority;
+            
+            // 改进建议数量
+            const improvements = analysis.vocItems.filter(item => item.type === '改进建议').length;
+            document.getElementById('result-improvements').textContent = improvements;
+            
+            // 更新VOC表
+            updateVOCTable(analysis.vocItems);
+            
+            // 更新VOC汇总
+            updateVOCSummary(analysis);
+        }
+
+        // 分析客户反馈
+        function analyzeCustomerFeedback(customerFeedback) {
+            const lines = customerFeedback.split('\n').filter(line => line.trim() !== '');
+            
+            const needs = [];
+            const expectations = [];
+            const factors = [];
+            const painPoints = [];
+            const vocItems = [];
+            
+            // 简单的关键词分析（实际应用中应使用更复杂的NLP技术）
+            lines.forEach(line => {
+                // 检测需求
+                if (line.includes('希望') || line.includes('需要') || line.includes('想要')) {
+                    needs.push(extractText(line));
+                    vocItems.push({
+                        type: '需求',
+                        content: extractText(line),
+                        importance: 3,
+                        satisfaction: 2,
+                        priority: '中'
+                    });
+                }
+                
+                // 检测期望
+                if (line.includes('期望') || line.includes('应该') || line.includes('理想')) {
+                    expectations.push(extractText(line));
+                    vocItems.push({
+                        type: '期望',
+                        content: extractText(line),
+                        importance: 4,
+                        satisfaction: 3,
+                        priority: '高'
+                    });
+                }
+                
+                // 检测关键因素
+                if (line.includes('关键') || line.includes('重要') || line.includes('影响因素')) {
+                    factors.push(extractText(line));
+                    vocItems.push({
+                        type: '关键因素',
+                        content: extractText(line),
+                        importance: 5,
+                        satisfaction: 3,
+                        priority: '高'
+                    });
+                }
+                
+                // 检测痛点
+                if (line.includes('问题') || line.includes('不满意') || line.includes('投诉') || 
+                    line.includes('破损') || line.includes('延迟') || line.includes('错误')) {
+                    painPoints.push(extractText(line));
+                    vocItems.push({
+                        type: '痛点',
+                        content: extractText(line),
+                        importance: 5,
+                        satisfaction: 1,
+                        priority: '高'
+                    });
+                }
+                
+                // 检测改进建议
+                if (line.includes('改进') || line.includes('建议') || line.includes('希望') || line.includes('推荐')) {
+                    vocItems.push({
+                        type: '改进建议',
+                        content: extractText(line),
+                        importance: 3,
+                        satisfaction: 2,
+                        priority: '中'
+                    });
+                }
+            });
+            
+            return {
+                needs: needs,
+                expectations: expectations,
+                factors: factors,
+                painPoints: painPoints,
+                vocItems: vocItems
+            };
+        }
+
+        // 提取文本（去除编号等）
+        function extractText(line) {
+            // 去除常见的编号前缀
+            return line.replace(/^(\d+[\.:\s]+|[A-Za-z]+[\.:\s]+)/, '').trim();
+        }
+
+        // 更新VOC表
+        function updateVOCTable(vocItems) {
+            const tbody = document.getElementById('voc-table-body');
+            tbody.innerHTML = '';
+            
+            // 创建表格行
+            vocItems.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // 类型
+                const typeCell = document.createElement('td');
+                typeCell.textContent = item.type;
+                row.appendChild(typeCell);
+                
+                // 内容
+                const contentCell = document.createElement('td');
+                contentCell.textContent = item.content;
+                row.appendChild(contentCell);
+                
+                // 重要性
+                const importanceCell = document.createElement('td');
+                importanceCell.textContent = item.importance;
+                row.appendChild(importanceCell);
+                
+                // 满意度
+                const satisfactionCell = document.createElement('td');
+                satisfactionCell.textContent = item.satisfaction;
+                row.appendChild(satisfactionCell);
+                
+                // 优先级
+                const priorityCell = document.createElement('td');
+                priorityCell.textContent = item.priority;
+                
+                // 根据优先级设置颜色
+                if (item.priority === '高') {
+                    priorityCell.style.backgroundColor = 'rgba(255, 99, 132, 0.2)';
+                } else if (item.priority === '中') {
+                    priorityCell.style.backgroundColor = 'rgba(255, 159, 64, 0.2)';
+                } else {
+                    priorityCell.style.backgroundColor = 'rgba(75, 192, 192, 0.2)';
+                }
+                
+                row.appendChild(priorityCell);
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // 更新VOC汇总
+        function updateVOCSummary(analysis) {
+            // 更新需求汇总
+            const needsSummary = document.getElementById('needs-summary');
+            needsSummary.innerHTML = analysis.needs.map(need => `<li>${need}</li>`).join('') || '<li>无</li>';
+            
+            // 更新期望汇总
+            const expectationsSummary = document.getElementById('expectations-summary');
+            expectationsSummary.innerHTML = analysis.expectations.map(exp => `<li>${exp}</li>`).join('') || '<li>无</li>';
+            
+            // 更新关键因素汇总
+            const factorsSummary = document.getElementById('factors-summary');
+            factorsSummary.innerHTML = analysis.factors.map(factor => `<li>${factor}</li>`).join('') || '<li>无</li>';
+            
+            // 更新痛点汇总
+            const painPointsSummary = document.getElementById('pain-points-summary');
+            painPointsSummary.innerHTML = analysis.painPoints.map(point => `<li>${point}</li>`).join('') || '<li>无</li>';
+        }
+
+        // 清空输入
+        function clearInputs() {
+            document.getElementById('customer-type').value = '';
+            document.getElementById('customer-feedback').value = '';
+            document.getElementById('results-section').style.display = 'none';
+        }
+
+        // 导出结果
+        function exportResults() {
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection.style.display === 'none') {
+                alert('请先分析VOC');
+                return;
+            }
+
+            // 获取结果数据
+            const method = document.getElementById('result-method').textContent;
+            const customerType = document.getElementById('result-customer-type').textContent;
+            const date = document.getElementById('result-date').textContent;
+            const feedbackCount = document.getElementById('result-feedback-count').textContent;
+            const needsCount = document.getElementById('result-needs-count').textContent;
+            const expectationsCount = document.getElementById('result-expectations-count').textContent;
+            const factorsCount = document.getElementById('result-factors-count').textContent;
+            const painPointsCount = document.getElementById('result-pain-points-count').textContent;
+            const highPriority = document.getElementById('result-high-priority').textContent;
+            const mediumPriority = document.getElementById('result-medium-priority').textContent;
+            const lowPriority = document.getElementById('result-low-priority').textContent;
+
+            // 创建CSV内容
+            let csvContent = 'VOC分析\n\n';
+            csvContent += `收集方法,${method}\n`;
+            csvContent += `客户类型,${customerType}\n`;
+            csvContent += `收集日期,${date}\n`;
+            csvContent += `反馈条数,${feedbackCount}\n\n`;
+            csvContent += `需求数量,${needsCount}\n`;
+            csvContent += `期望数量,${expectationsCount}\n`;
+            csvContent += `关键因素数,${factorsCount}\n`;
+            csvContent += `痛点数,${painPointsCount}\n\n`;
+            csvContent += `高优先级项,${highPriority}\n`;
+            csvContent += `中优先级项,${mediumPriority}\n`;
+            csvContent += `低优先级项,${lowPriority}\n\n`;
+            
+            // 添加VOC表
+            csvContent += '类型,内容,重要性,满意度,优先级\n';
+            const tableRows = document.querySelectorAll('#voc-table-body tr');
+            tableRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 0) {
+                    csvContent += `${cells[0].textContent},${cells[1].textContent},${cells[2].textContent},${cells[3].textContent},${cells[4].textContent}\n`;
+                }
+            });
+
+            // 下载CSV文件
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'VOC分析结果.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>

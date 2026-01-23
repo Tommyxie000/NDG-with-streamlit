@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>过程能力分析 - 6 Sigma质量管理学习平台</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tools.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>6 Sigma质量管理学习平台</h1>
+                <p>过程能力分析</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../../index.html">首页</a></li>
+                    <li><a href="../index.html" class="active">工具库</a></li>
+                    <li><a href="../../videos/index.html">视频教程</a></li>
+                    <li><a href="../../cases/index.html">培训案例</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="tool-intro">
+            <h2>过程能力分析 (Process Capability Analysis)</h2>
+            <p>过程能力分析是6 Sigma测量阶段的核心工具，用于评估过程是否满足规格要求。通过计算Cp、Cpk等指数，可以量化过程能力，为改进提供依据。</p>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <h4>应用场景</h4>
+                    <ul>
+                        <li>评估生产过程是否满足规格要求</li>
+                        <li>比较不同过程的能力水平</li>
+                        <li>识别需要改进的过程</li>
+                        <li>验证改进效果</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>核心指标</h4>
+                    <ul>
+                        <li><strong>Cp</strong>：过程能力指数（不考虑中心偏移）</li>
+                        <li><strong>Cpk</strong>：过程能力指数（考虑中心偏移）</li>
+                        <li><strong>CPU</strong>：上限过程能力</li>
+                        <li><strong>CPL</strong>：下限过程能力</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>判断标准</h4>
+                    <ul>
+                        <li>Cpk < 1.0：过程能力不足</li>
+                        <li>1.0 ≤ Cpk < 1.33：过程能力尚可</li>
+                        <li>1.33 ≤ Cpk < 1.67：过程能力良好</li>
+                        <li>Cpk ≥ 1.67：过程能力优秀</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-calculator">
+            <h3>交互式计算</h3>
+            <div class="calculator-grid">
+                <div class="input-group">
+                    <label>规格上限 (USL)：</label>
+                    <input type="number" id="usl" step="0.001" placeholder="输入规格上限">
+                </div>
+                <div class="input-group">
+                    <label>规格下限 (LSL)：</label>
+                    <input type="number" id="lsl" step="0.001" placeholder="输入规格下限">
+                </div>
+                <div class="input-group">
+                    <label>规格中心值 (Target)：</label>
+                    <input type="number" id="target" step="0.001" placeholder="输入规格中心值">
+                </div>
+                <div class="input-group">
+                    <label>数据输入（用逗号分隔）：</label>
+                    <textarea id="data-input" rows="5" placeholder="输入数据，如：10.5, 10.8, 10.3, 10.7, 10.6"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>数据精度：</label>
+                    <select id="precision">
+                        <option value="3">3位小数</option>
+                        <option value="4">4位小数</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="calculateCapability()" class="btn btn-primary">计算过程能力</button>
+                <button onclick="clearInputs()" class="btn btn-secondary">清空输入</button>
+                <button onclick="exportResults()" class="btn btn-success">导出结果</button>
+            </div>
+        </section>
+
+        <section class="results-section" id="results-section" style="display: none;">
+            <h3>计算结果</h3>
+            <div class="results-grid">
+                <div class="result-card">
+                    <h4>统计信息</h4>
+                    <div class="result-item">
+                        <span>样本量 (n)：</span>
+                        <strong id="result-n">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>平均值 (μ)：</span>
+                        <strong id="result-mean">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>标准差 (σ)：</span>
+                        <strong id="result-std">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>最大值：</span>
+                        <strong id="result-max">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>最小值：</span>
+                        <strong id="result-min">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>过程能力指数</h4>
+                    <div class="result-item">
+                        <span>Cp：</span>
+                        <strong id="result-cp">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>Cpk：</span>
+                        <strong id="result-cpk" style="font-size: 1.2em;">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>CPU：</span>
+                        <strong id="result-cpu">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>CPL：</span>
+                        <strong id="result-cpl">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>能力评估</h4>
+                    <div class="result-item">
+                        <span>过程能力等级：</span>
+                        <strong id="result-level">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>是否满足要求：</span>
+                        <strong id="result-status">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>改进建议：</span>
+                        <strong id="result-suggestion">-</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h4>数据分布图</h4>
+                <div style="height: 400px; margin: 20px 0;">
+                    <canvas id="capability-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-steps">
+            <h3>操作步骤</h3>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>收集数据</h4>
+                        <p>收集足够数量的样本数据（建议n ≥ 30），确保数据具有代表性。数据应来自稳定的过程。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>验证正态分布</h4>
+                        <p>使用直方图或正态性检验（如Shapiro-Wilk检验）验证数据是否符合正态分布。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>计算统计量</h4>
+                        <p>计算样本平均值和样本标准差。注意使用样本标准差（分母为n-1），而非总体标准差。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>计算过程能力指数</h4>
+                        <p>根据公式计算Cp、Cpk、CPU、CPL等指数，评估过程能力水平。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>分析结果</h4>
+                        <p>根据计算结果判断过程能力是否满足要求，制定改进计划。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-notes">
+            <h3>注意事项</h3>
+            <div class="notes-list">
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>数据正态性</strong>：过程能力分析要求数据符合正态分布。如果数据不符合正态分布，需要先进行数据转换或使用非参数方法。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>过程稳定性</strong>：计算过程能力前，必须确保过程处于统计控制状态。使用控制图验证过程稳定性。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>样本量</strong>：样本量越大，估计越准确。建议样本量至少为30，理想情况下为100以上。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>规格要求</strong>：确保规格上限和下限设置正确，考虑客户要求和技术能力。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">💡</span>
+                    <p><strong>Cpk vs Cp</strong>：Cpk考虑了过程中心偏移，是更保守的指标。当过程中心与规格中心一致时，Cp = Cpk。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="related-tools">
+            <h3>相关工具</h3>
+            <div class="related-grid">
+                <div class="related-item">
+                    <h4>MSA分析</h4>
+                    <p>评估测量系统是否准确可靠</p>
+                    <a href="msa.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>SPC控制图</h4>
+                    <p>监控过程稳定性</p>
+                    <a href="../control/spc.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>假设检验</h4>
+                    <p>验证过程改进效果</p>
+                    <a href="../analyze/hypothesis-test.html" class="btn btn-small">查看工具</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-recommendations">
+            <h3>推荐视频教程</h3>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>过程能力分析入门</h4>
+                        <p>YouTube - Six Sigma Institute</p>
+                        <span class="video-duration">15分钟</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=example1" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>Cp和Cpk计算详解</h4>
+                        <p>B站 - 精益六西格玛实战</p>
+                        <span class="video-duration">20分钟</span>
+                    </div>
+                    <a href="https://www.bilibili.com/video/BV1example" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 6 Sigma质量管理学习平台. 专注于数据处理和工具应用</p>
+        </div>
+    </footer>
+
+    <script src="../../js/tools.js"></script>
+    <script>
+        let capabilityChart = null;
+
+        function calculateCapability() {
+            const usl = parseFloat(document.getElementById('usl').value);
+            const lsl = parseFloat(document.getElementById('lsl').value);
+            const target = parseFloat(document.getElementById('target').value);
+            const dataStr = document.getElementById('data-input').value;
+            const precision = parseInt(document.getElementById('precision').value);
+
+            if (isNaN(usl) || isNaN(lsl) || !dataStr.trim()) {
+                alert('请输入完整的参数和数据');
+                return;
+            }
+
+            if (usl <= lsl) {
+                alert('规格上限必须大于规格下限');
+                return;
+            }
+
+            const data = dataStr.split(',').map(d => parseFloat(d.trim())).filter(d => !isNaN(d));
+            
+            if (data.length < 2) {
+                alert('请至少输入2个数据点');
+                return;
+            }
+
+            const n = data.length;
+            const mean = data.reduce((sum, val) => sum + val, 0) / n;
+            const variance = data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / (n - 1);
+            const std = Math.sqrt(variance);
+            const max = Math.max(...data);
+            const min = Math.min(...data);
+
+            const cp = (usl - lsl) / (6 * std);
+            const cpu = (usl - mean) / (3 * std);
+            const cpl = (mean - lsl) / (3 * std);
+            const cpk = Math.min(cpu, cpl);
+
+            let level, status, suggestion, color;
+            if (cpk < 1.0) {
+                level = '不足';
+                status = '不满足';
+                suggestion = '需要立即改进过程';
+                color = 'red';
+            } else if (cpk < 1.33) {
+                level = '尚可';
+                status = '基本满足';
+                suggestion = '建议持续改进';
+                color = 'orange';
+            } else if (cpk < 1.67) {
+                level = '良好';
+                status = '满足';
+                suggestion = '保持当前水平';
+                color = 'green';
+            } else {
+                level = '优秀';
+                status = '完全满足';
+                suggestion = '可作为标杆';
+                color = 'darkgreen';
+            }
+
+            document.getElementById('result-n').textContent = n;
+            document.getElementById('result-mean').textContent = mean.toFixed(precision);
+            document.getElementById('result-std').textContent = std.toFixed(precision);
+            document.getElementById('result-max').textContent = max.toFixed(precision);
+            document.getElementById('result-min').textContent = min.toFixed(precision);
+            document.getElementById('result-cp').textContent = cp.toFixed(precision);
+            document.getElementById('result-cpk').textContent = cpk.toFixed(precision);
+            document.getElementById('result-cpk').style.color = color;
+            document.getElementById('result-cpu').textContent = cpu.toFixed(precision);
+            document.getElementById('result-cpl').textContent = cpl.toFixed(precision);
+            document.getElementById('result-level').textContent = level;
+            document.getElementById('result-level').style.color = color;
+            document.getElementById('result-status').textContent = status;
+            document.getElementById('result-status').style.color = color;
+            document.getElementById('result-suggestion').textContent = suggestion;
+
+            document.getElementById('results-section').style.display = 'block';
+
+            drawCapabilityChart(data, mean, std, lsl, usl, target);
+        }
+
+        function drawCapabilityChart(data, mean, std, lsl, usl, target) {
+            const ctx = document.getElementById('capability-chart').getContext('2d');
+            
+            if (capabilityChart) {
+                capabilityChart.destroy();
+            }
+
+            const dataMin = Math.min(...data, lsl);
+            const dataMax = Math.max(...data, usl);
+            const chartMin = dataMin - 0.01;
+            const chartMax = dataMax + 0.01;
+            const binCount = 10;
+            const binWidth = (chartMax - chartMin) / binCount;
+
+            const bins = Array(binCount).fill(0);
+            data.forEach(value => {
+                const binIndex = Math.min(Math.floor((value - chartMin) / binWidth), binCount - 1);
+                bins[binIndex]++;
+            });
+
+            const xAxisLabels = Array.from({length: binCount + 1}, (_, i) => {
+                const value = chartMin + i * binWidth;
+                return value.toFixed(2);
+            });
+
+            const curvePointCount = 100;
+            const curveX = Array.from({length: curvePointCount}, (_, i) => {
+                return chartMin + (chartMax - chartMin) * i / (curvePointCount - 1);
+            });
+
+            const normalValues = curveX.map(x => {
+                const exponent = -0.5 * Math.pow((x - mean) / std, 2);
+                return (1 / (std * Math.sqrt(2 * Math.PI))) * Math.exp(exponent);
+            });
+
+            const maxBinHeight = Math.max(...bins);
+            const maxNormalValue = Math.max(...normalValues);
+            const curveY = normalValues.map(value => (value / maxNormalValue) * maxBinHeight * 1.1);
+
+            capabilityChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: xAxisLabels.slice(0, -1),
+                    datasets: [
+                        {
+                            label: '数据分布',
+                            data: bins,
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '正态分布曲线',
+                            data: curveY,
+                            type: 'line',
+                            backgroundColor: 'transparent',
+                            borderColor: 'rgba(255, 0, 0, 0.8)',
+                            borderWidth: 2,
+                            fill: false,
+                            pointRadius: 0,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: `正态分布直方图（μ=${mean.toFixed(4)}, σ=${std.toFixed(4)}）`
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function clearInputs() {
+            document.getElementById('usl').value = '';
+            document.getElementById('lsl').value = '';
+            document.getElementById('target').value = '';
+            document.getElementById('data-input').value = '';
+            document.getElementById('results-section').style.display = 'none';
+            if (capabilityChart) {
+                capabilityChart.destroy();
+                capabilityChart = null;
+            }
+        }
+
+        function exportResults() {
+            const usl = document.getElementById('usl').value;
+            const lsl = document.getElementById('lsl').value;
+            const target = document.getElementById('target').value;
+            const dataStr = document.getElementById('data-input').value;
+            const precision = document.getElementById('precision').value;
+
+            if (!usl || !lsl || !dataStr) {
+                alert('请先计算结果');
+                return;
+            }
+
+            const results = {
+                '规格上限 (USL)': usl,
+                '规格下限 (LSL)': lsl,
+                '规格中心值 (Target)': target,
+                '数据精度': precision + '位小数',
+                '样本量 (n)': document.getElementById('result-n').textContent,
+                '平均值 (μ)': document.getElementById('result-mean').textContent,
+                '标准差 (σ)': document.getElementById('result-std').textContent,
+                'Cp': document.getElementById('result-cp').textContent,
+                'Cpk': document.getElementById('result-cpk').textContent,
+                'CPU': document.getElementById('result-cpu').textContent,
+                'CPL': document.getElementById('result-cpl').textContent,
+                '过程能力等级': document.getElementById('result-level').textContent,
+                '是否满足要求': document.getElementById('result-status').textContent,
+                '改进建议': document.getElementById('result-suggestion').textContent
+            };
+
+            let csvContent = '指标,数值\n';
+            for (const [key, value] of Object.entries(results)) {
+                csvContent += `${key},${value}\n`;
+            }
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '过程能力分析结果.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>

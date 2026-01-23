@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOE实验设计 - 6 Sigma质量管理学习平台</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tools.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>6 Sigma质量管理学习平台</h1>
+                <p>DOE实验设计</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../../index.html">首页</a></li>
+                    <li><a href="../index.html" class="active">工具库</a></li>
+                    <li><a href="../../videos/index.html">视频教程</a></li>
+                    <li><a href="../../cases/index.html">培训案例</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="tool-intro">
+            <h2>DOE实验设计 (Design of Experiments)</h2>
+            <p>DOE是6 Sigma改进阶段的核心工具，用于系统性地设计实验，确定影响过程的关键因素，并优化过程参数。通过设计合理的实验计划，可以用最少的实验次数获得最大的信息量，从而高效地识别最优参数组合。</p>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <h4>应用场景</h4>
+                    <ul>
+                        <li>优化产品或过程性能</li>
+                        <li>识别影响质量的关键因素</li>
+                        <li>减少变异并提高过程能力</li>
+                        <li>开发新产品或改进现有产品</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>常见类型</h4>
+                    <ul>
+                        <li><strong>全因子设计</strong>：所有因素的所有水平组合</li>
+                        <li><strong>部分因子设计</strong>：部分因素的组合</li>
+                        <li><strong>响应曲面设计</strong>：寻找最优参数组合</li>
+                        <li><strong>混料设计</strong>：研究配方成分比例</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>关键概念</h4>
+                    <ul>
+                        <li><strong>因素</strong>：实验中研究的变量</li>
+                        <li><strong>水平</strong>：因素的不同取值</li>
+                        <li><strong>响应</strong>：实验的输出或结果</li>
+                        <li><strong>交互作用</strong>：因素间的相互作用</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-calculator">
+            <h3>DOE实验设计</h3>
+            <div class="calculator-grid">
+                <div class="input-group">
+                    <label>实验类型：</label>
+                    <select id="experiment-type">
+                        <option value="full-factorial">全因子设计</option>
+                        <option value="fractional-factorial">部分因子设计</option>
+                        <option value="response-surface">响应曲面设计</option>
+                        <option value="mixture">混料设计</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>因素数量：</label>
+                    <input type="number" id="factor-count" min="2" max="5" value="3">
+                </div>
+                <div class="input-group">
+                    <label>每个因素的水平数：</label>
+                    <input type="number" id="levels" min="2" max="5" value="2">
+                </div>
+                <div class="input-group">
+                    <label>因素设置（每行一个因素，逗号分隔）：</label>
+                    <textarea id="factor-settings" rows="5" placeholder="例如：
+温度,100,120
+压力,10,15,20
+时间,30,60"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>响应设置：</label>
+                    <input type="text" id="response-name" placeholder="例如：产量">
+                </div>
+                <div class="input-group">
+                    <label>重复次数：</label>
+                    <input type="number" id="replicates" min="1" max="5" value="1">
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="generateDesign()" class="btn btn-primary">生成实验设计</button>
+                <button onclick="loadSampleData()" class="btn btn-secondary">加载示例数据</button>
+                <button onclick="clearInputs()" class="btn btn-secondary">清空输入</button>
+                <button onclick="exportResults()" class="btn btn-success">导出结果</button>
+            </div>
+        </section>
+
+        <section class="results-section" id="results-section" style="display: none;">
+            <h3>实验设计结果</h3>
+            <div class="results-grid">
+                <div class="result-card">
+                    <h4>设计信息</h4>
+                    <div class="result-item">
+                        <span>实验类型：</span>
+                        <strong id="result-design-type">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>因素数量：</span>
+                        <strong id="result-factors">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>水平数：</span>
+                        <strong id="result-levels">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>实验次数：</span>
+                        <strong id="result-experiments">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>实验计划</h4>
+                    <div class="result-item">
+                        <span>基础实验次数：</span>
+                        <strong id="result-base-experiments">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>重复次数：</span>
+                        <strong id="result-replicates">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>总实验次数：</span>
+                        <strong id="result-total-experiments">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>分析重点：</span>
+                        <strong id="result-analysis-focus">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>实验效率</h4>
+                    <div class="result-item">
+                        <span>理论最大实验数：</span>
+                        <strong id="result-theoretical-max">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>实际实验数：</span>
+                        <strong id="result-actual-experiments">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>效率：</span>
+                        <strong id="result-efficiency">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>交互作用检测：</span>
+                        <strong id="result-interaction-detection">-</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h4>实验设计矩阵</h4>
+                <div style="height: 400px; margin: 20px 0;">
+                    <canvas id="design-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="table-section">
+                <h4>实验设计表</h4>
+                <div class="table-container">
+                    <table id="design-table" class="data-table">
+                        <thead id="design-table-head">
+                            <!-- 动态内容 -->
+                        </thead>
+                        <tbody id="design-table-body">
+                            <!-- 动态内容 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-steps">
+            <h3>操作步骤</h3>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>确定实验目标</h4>
+                        <p>明确实验要解决的问题，是筛选关键因素、优化参数还是寻找最优条件。目标应具体、可测量。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>选择因素和水平</h4>
+                        <p>选择可能影响响应的因素，确定每个因素的水平（设置值）。因素应独立，水平应有意义且可实施。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>选择实验设计类型</h4>
+                        <p>根据因素数量、资源限制和实验目标选择合适的设计类型。全因子设计信息最完整，部分因子设计更经济。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>随机化实验顺序</h4>
+                        <p>随机化实验运行顺序可以消除未知因素的影响。考虑使用区组设计处理已知但难以控制的因素。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>执行实验并收集数据</h4>
+                        <p>严格按照设计的实验条件执行，确保测量准确可靠。记录所有相关信息，包括任何异常情况。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>分析数据并确定最优条件</h4>
+                        <p>使用方差分析（ANOVA）和响应曲面等方法分析数据，识别显著因素和交互作用，确定最优参数组合。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-notes">
+            <h3>注意事项</h3>
+            <div class="notes-list">
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>因素选择</strong>：选择因素时应考虑其对响应的影响程度、实施的难易程度和成本。避免选择过多因素，以免实验过于复杂。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>水平设置</strong>：因素水平的设置应有意义且可实施。水平间隔过小可能难以检测差异，过大可能错过最优值。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>实验执行</strong>：严格按照实验条件执行，保持除因素外的其他条件一致。测量系统必须可靠，避免测量误差影响结果。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>数据分析</strong>：使用适当的统计方法分析数据，检查模型假设，识别异常值。确保结论基于数据而非主观判断。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">💡</span>
+                    <p><strong>确认实验</strong>：在确定最优条件后，应进行确认实验，验证模型预测是否准确。必要时调整实验设计或参数设置。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="related-tools">
+            <h3>相关工具</h3>
+            <div class="related-grid">
+                <div class="related-item">
+                    <h4>假设检验</h4>
+                    <p>验证实验结果的显著性</p>
+                    <a href="../analyze/hypothesis-test.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>过程能力分析</h4>
+                    <p>评估优化后的过程性能</p>
+                    <a href="../measure/process-capability.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>SPC控制图</h4>
+                    <p>监控优化后的过程稳定性</p>
+                    <a href="../control/spc.html" class="btn btn-small">查看工具</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-recommendations">
+            <h3>推荐视频教程</h3>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>DOE实验设计基础</h4>
+                        <p>YouTube - Six Sigma Institute</p>
+                        <span class="video-duration">20分钟</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=example1" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>DOE实战案例</h4>
+                        <p>B站 - 质量管理学习</p>
+                        <span class="video-duration">25分钟</span>
+                    </div>
+                    <a href="https://www.bilibili.com/video/BV1example" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 6 Sigma质量管理学习平台. 专注于数据处理和工具应用</p>
+        </div>
+    </footer>
+
+    <script src="../../js/tools.js"></script>
+    <script>
+        let designChart = null;
+
+        // 加载示例数据
+        function loadSampleData() {
+            const experimentType = document.getElementById('experiment-type').value;
+            
+            if (experimentType === 'full-factorial') {
+                document.getElementById('factor-count').value = 3;
+                document.getElementById('levels').value = 2;
+                document.getElementById('factor-settings').value = `温度,80,100
+压力,10,15
+时间,30,60`;
+                document.getElementById('response-name').value = '产量';
+                document.getElementById('replicates').value = 1;
+            } else if (experimentType === 'fractional-factorial') {
+                document.getElementById('factor-count').value = 4;
+                document.getElementById('levels').value = 2;
+                document.getElementById('factor-settings').value = `温度,80,100
+压力,10,15
+时间,30,60
+速度,100,120`;
+                document.getElementById('response-name').value = '产量';
+                document.getElementById('replicates').value = 1;
+            } else if (experimentType === 'response-surface') {
+                document.getElementById('factor-count').value = 2;
+                document.getElementById('levels').value = 3;
+                document.getElementById('factor-settings').value = `温度,80,90,100
+压力,10,12.5,15`;
+                document.getElementById('response-name').value = '产量';
+                document.getElementById('replicates').value = 2;
+            } else if (experimentType === 'mixture') {
+                document.getElementById('factor-count').value = 3;
+                document.getElementById('levels').value = 3;
+                document.getElementById('factor-settings').value = `成分A,0,50,100
+成分B,0,50,100
+成分C,0,50,100`;
+                document.getElementById('response-name').value = '性能';
+                document.getElementById('replicates').value = 1;
+            }
+        }
+
+        // 生成实验设计
+        function generateDesign() {
+            const experimentType = document.getElementById('experiment-type').value;
+            const factorCount = parseInt(document.getElementById('factor-count').value);
+            const levels = parseInt(document.getElementById('levels').value);
+            const factorSettings = document.getElementById('factor-settings').value.trim();
+            const responseName = document.getElementById('response-name').value.trim();
+            const replicates = parseInt(document.getElementById('replicates').value);
+
+            // 验证输入
+            if (factorCount < 2) {
+                alert('因素数量至少为2');
+                return;
+            }
+
+            if (levels < 2) {
+                alert('每个因素至少应有2个水平');
+                return;
+            }
+
+            if (!factorSettings) {
+                alert('请输入因素设置');
+                return;
+            }
+
+            if (!responseName) {
+                alert('请输入响应名称');
+                return;
+            }
+
+            // 解析因素设置
+            const factors = [];
+            const lines = factorSettings.split('\n').filter(line => line.trim() !== '');
+            
+            if (lines.length !== factorCount) {
+                alert(`因素设置行数（${lines.length}）与因素数量（${factorCount}）不匹配`);
+                return;
+            }
+
+            lines.forEach(line => {
+                const parts = line.split(',');
+                if (parts.length < levels + 1) {
+                    alert(`因素设置行数（${parts.length}）与水平数（${levels}）不匹配`);
+                    return;
+                }
+                
+                const name = parts[0].trim();
+                const values = parts.slice(1).map(p => p.trim()).slice(0, levels);
+                
+                factors.push({
+                    name: name,
+                    values: values
+                });
+            });
+
+            // 生成实验设计
+            let designMatrix = [];
+            let baseExperiments = 0;
+            let totalExperiments = 0;
+            let analysisFocus = '';
+            let efficiency = 0;
+            let interactionDetection = false;
+
+            if (experimentType === 'full-factorial') {
+                // 全因子设计
+                baseExperiments = Math.pow(levels, factorCount);
+                designMatrix = generateFullFactorialDesign(factors);
+                analysisFocus = '主效应和交互作用';
+                efficiency = 100;
+                interactionDetection = factorCount <= 3;
+            } else if (experimentType === 'fractional-factorial') {
+                // 部分因子设计
+                baseExperiments = Math.pow(2, Math.floor(factorCount - 1));
+                designMatrix = generateFractionalFactorialDesign(factors);
+                analysisFocus = '主要效应，部分交互作用';
+                efficiency = baseExperiments / Math.pow(2, factorCount) * 100;
+                interactionDetection = factorCount <= 4;
+            } else if (experimentType === 'response-surface') {
+                // 响应曲面设计
+                baseExperiments = Math.pow(levels, factorCount);
+                designMatrix = generateResponseSurfaceDesign(factors);
+                analysisFocus = '主效应、二次效应和交互作用';
+                efficiency = baseExperiments / Math.pow(levels, factorCount) * 100;
+                interactionDetection = true;
+            } else if (experimentType === 'mixture') {
+                // 混料设计
+                baseExperiments = Math.pow(levels, factorCount);
+                designMatrix = generateMixtureDesign(factors);
+                analysisFocus = '主效应和混料效应';
+                efficiency = baseExperiments / Math.pow(levels, factorCount) * 100;
+                interactionDetection = factorCount <= 3;
+            }
+
+            totalExperiments = baseExperiments * replicates;
+
+            // 显示结果
+            displayResults(experimentType, factorCount, levels, baseExperiments, totalExperiments, analysisFocus, efficiency, interactionDetection, factors, designMatrix);
+
+            // 绘制图表
+            drawDesignChart(designMatrix, factors);
+
+            // 显示结果部分
+            document.getElementById('results-section').style.display = 'block';
+        }
+
+        // 生成全因子设计
+        function generateFullFactorialDesign(factors) {
+            const levels = factors[0].values.length;
+            const combinations = [];
+            
+            // 生成所有因子水平组合
+            function generateCombinations(currentCombo, factorIndex) {
+                if (factorIndex === factors.length) {
+                    combinations.push([...currentCombo]);
+                    return;
+                }
+                
+                for (let i = 0; i < levels; i++) {
+                    currentCombo.push(i);
+                    generateCombinations(currentCombo, factorIndex + 1);
+                    currentCombo.pop();
+                }
+            }
+            
+            generateCombinations([], 0);
+            
+            // 转换为实验设计矩阵
+            const designMatrix = combinations.map(combo => {
+                const row = {};
+                row['实验编号'] = combinations.indexOf(combo) + 1;
+                
+                factors.forEach((factor, index) => {
+                    row[factor.name] = factor.values[combo[index]];
+                });
+                
+                row['重复次数'] = 1;
+                
+                return row;
+            });
+            
+            return designMatrix;
+        }
+
+        // 生成部分因子设计
+        function generateFractionalFactorialDesign(factors) {
+            // 简化的部分因子设计生成
+            // 实际实现中应使用更复杂的算法生成最优设计
+            
+            // 使用Plackett-Burman设计作为简化示例
+            if (factors.length === 4 && factors[0].values.length === 2) {
+                // 4因素的1/2因子设计
+                return [
+                    { '实验编号': 1, [factors[0].name]: factors[0].values[0], [factors[1].name]: factors[1].values[0], [factors[2].name]: factors[2].values[0], [factors[3].name]: factors[3].values[0], '重复次数': 1 },
+                    { '实验编号': 2, [factors[0].name]: factors[0].values[0], [factors[1].name]: factors[1].values[1], [factors[2].name]: factors[2].values[1], [factors[3].name]: factors[3].values[0], '重复次数': 1 },
+                    { '实验编号': 3, [factors[0].name]: factors[0].values[1], [factors[1].name]: factors[1].values[0], [factors[2].name]: factors[2].values[1], [factors[3].name]: factors[3].values[0], '重复次数': 1 },
+                    { '实验编号': 4, [factors[0].name]: factors[0].values[1], [factors[1].name]: factors[1].values[1], [factors[2].name]: factors[2].values[0], [factors[3].name]: factors[3].values[0], '重复次数': 1 },
+                    { '实验编号': 5, [factors[0].name]: factors[0].values[0], [factors[1].name]: factors[1].values[0], [factors[2].name]: factors[2].values[1], [factors[3].name]: factors[3].values[1], '重复次数': 1 },
+                    { '实验编号': 6, [factors[0].name]: factors[0].values[0], [factors[1].name]: factors[1].values[1], [factors[2].name]: factors[2].values[0], [factors[3].name]: factors[3].values[1], '重复次数': 1 },
+                    { '实验编号': 7, [factors[0].name]: factors[0].values[1], [factors[1].name]: factors[1].values[0], [factors[2].name]: factors[2].values[0], [factors[3].name]: factors[3].values[1], '重复次数': 1 },
+                    { '实验编号': 8, [factors[0].name]: factors[0].values[1], [factors[1].name]: factors[1].values[1], [factors[2].name]: factors[2].values[1], [factors[3].name]: factors[3].values[1], '重复次数': 1 }
+                ];
+            } else {
+                // 其他情况回退到全因子设计
+                return generateFullFactorialDesign(factors);
+            }
+        }
+
+        // 生成响应曲面设计
+        function generateResponseSurfaceDesign(factors) {
+            // 简化的响应曲面设计（中心复合设计）
+            // 实际实现中应使用更精确的设计
+            
+            if (factors.length === 2) {
+                // 2因素的中心复合设计
+                const design = [];
+                let experimentNumber = 1;
+                
+                // 因子点
+                for (let i = 0; i < factors[0].values.length; i++) {
+                    for (let j = 0; j < factors[1].values.length; j++) {
+                        design.push({
+                            '实验编号': experimentNumber++,
+                            [factors[0].name]: factors[0].values[i],
+                            [factors[1].name]: factors[1].values[j],
+                            '重复次数': 1
+                        });
+                    }
+                }
+                
+                // 轴向点
+                const centerValue0 = (parseFloat(factors[0].values[0]) + parseFloat(factors[0].values[factors[0].values.length-1])) / 2;
+                const centerValue1 = (parseFloat(factors[1].values[0]) + parseFloat(factors[1].values[factors[1].values.length-1])) / 2;
+                const alpha = 1.414; // 简化的轴向点系数
+                
+                design.push({
+                    '实验编号': experimentNumber++,
+                    [factors[0].name]: centerValue0 * alpha,
+                    [factors[1].name]: centerValue1,
+                    '重复次数': 1
+                });
+                
+                design.push({
+                    '实验编号': experimentNumber++,
+                    [factors[0].name]: centerValue0 * -alpha,
+                    [factors[1].name]: centerValue1,
+                    '重复次数': 1
+                });
+                
+                design.push({
+                    '实验编号': experimentNumber++,
+                    [factors[0].name]: centerValue0,
+                    [factors[1].name]: centerValue1 * alpha,
+                    '重复次数': 1
+                });
+                
+                design.push({
+                    '实验编号': experimentNumber++,
+                    [factors[0].name]: centerValue0,
+                    [factors[1].name]: centerValue1 * -alpha,
+                    '重复次数': 1
+                });
+                
+                // 中心点
+                design.push({
+                    '实验编号': experimentNumber++,
+                    [factors[0].name]: centerValue0,
+                    [factors[1].name]: centerValue1,
+                    '重复次数': 1
+                });
+                
+                return design;
+            } else {
+                // 其他情况回退到全因子设计
+                return generateFullFactorialDesign(factors);
+            }
+        }
+
+        // 生成混料设计
+        function generateMixtureDesign(factors) {
+            // 简化的混料设计
+            // 实际实现中应使用更精确的设计
+            
+            // 使用单纯形格子设计作为简化示例
+            const m = factors.length; // 混料成分数
+            const q = factors[0].values.length; // 水平数
+            
+            // 生成单纯形格子点
+            const combinations = [];
+            
+            function generateCombinations(currentCombo, remaining, total) {
+                if (remaining === 1) {
+                    currentCombo.push(total);
+                    combinations.push([...currentCombo]);
+                    currentCombo.pop();
+                    return;
+                }
+                
+                for (let i = 0; i <= total; i++) {
+                    currentCombo.push(i);
+                    generateCombinations(currentCombo, remaining - 1, total - i);
+                    currentCombo.pop();
+                }
+            }
+            
+            generateCombinations([], m, q - 1);
+            
+            // 转换为实验设计矩阵
+            const designMatrix = combinations.map(combo => {
+                const row = {};
+                row['实验编号'] = combinations.indexOf(combo) + 1;
+                
+                // 混料设计要求各成分比例之和为1
+                const sum = combo.reduce((a, b) => a + b, 0);
+                const normalizedCombo = combo.map(val => val / sum);
+                
+                factors.forEach((factor, index) => {
+                    row[factor.name] = (normalizedCombo[index] * 100).toFixed(1) + '%';
+                });
+                
+                row['重复次数'] = 1;
+                
+                return row;
+            });
+            
+            return designMatrix;
+        }
+
+        // 显示结果
+        function displayResults(experimentType, factorCount, levels, baseExperiments, totalExperiments, analysisFocus, efficiency, interactionDetection, factors, designMatrix) {
+            // 获取设计类型的中文名称
+            let designTypeName = '';
+            switch (experimentType) {
+                case 'full-factorial':
+                    designTypeName = '全因子设计';
+                    break;
+                case 'fractional-factorial':
+                    designTypeName = '部分因子设计';
+                    break;
+                case 'response-surface':
+                    designTypeName = '响应曲面设计';
+                    break;
+                case 'mixture':
+                    designTypeName = '混料设计';
+                    break;
+            }
+            
+            // 显示基本统计信息
+            document.getElementById('result-design-type').textContent = designTypeName;
+            document.getElementById('result-factors').textContent = factorCount;
+            document.getElementById('result-levels').textContent = levels;
+            document.getElementById('result-experiments').textContent = baseExperiments;
+            document.getElementById('result-base-experiments').textContent = baseExperiments;
+            document.getElementById('result-replicates').textContent = document.getElementById('replicates').value;
+            document.getElementById('result-total-experiments').textContent = totalExperiments;
+            document.getElementById('result-analysis-focus').textContent = analysisFocus;
+            
+            // 计算理论最大值
+            const theoreticalMax = Math.pow(levels, factorCount);
+            document.getElementById('result-theoretical-max').textContent = theoreticalMax;
+            document.getElementById('result-actual-experiments').textContent = baseExperiments;
+            document.getElementById('result-efficiency').textContent = efficiency.toFixed(1) + '%';
+            document.getElementById('result-interaction-detection').textContent = interactionDetection ? '是' : '否';
+            
+            // 更新表格
+            updateDesignTable(factors, designMatrix);
+        }
+
+        // 更新设计表
+        function updateDesignTable(factors, designMatrix) {
+            const thead = document.getElementById('design-table-head');
+            const tbody = document.getElementById('design-table-body');
+            
+            // 清空表格
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+            
+            // 创建表头
+            const headerRow = document.createElement('tr');
+            const headers = ['实验编号', ...factors.map(f => f.name), '重复次数'];
+            
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            
+            thead.appendChild(headerRow);
+            
+            // 创建表格行
+            designMatrix.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                headers.forEach(header => {
+                    const td = document.createElement('td');
+                    td.textContent = row[header];
+                    tr.appendChild(td);
+                });
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 绘制实验设计图表
+        function drawDesignChart(designMatrix, factors) {
+            const ctx = document.getElementById('design-chart').getContext('2d');
+            
+            if (designChart) {
+                designChart.destroy();
+            }
+            
+            // 准备数据
+            const datasets = [];
+            const labels = factors.map(f => f.name);
+            
+            // 如果有两个因素，绘制散点图
+            if (factors.length === 2) {
+                const xValues = designMatrix.map(row => parseFloat(row[factors[0].name]));
+                const yValues = designMatrix.map(row => parseFloat(row[factors[1].name]));
+                
+                designChart = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: '实验点',
+                            data: designMatrix.map((row, index) => ({
+                                x: parseFloat(row[factors[0].name]),
+                                y: parseFloat(row[factors[1].name]),
+                                label: `实验${index + 1}`
+                            })),
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: `实验设计点分布图（${factors[0].name} vs ${factors[1].name}）`
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: factors[0].name
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: factors[1].name
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                // 多因素情况，绘制雷达图
+                const data = factors.map(factor => {
+                    // 获取该因素的所有值
+                    const values = designMatrix.map(row => parseFloat(row[factor.name]));
+                    // 计算平均值
+                    const sum = values.reduce((a, b) => a + b, 0);
+                    return sum / values.length;
+                });
+                
+                designChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '因素平均值',
+                            data: data,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: '因素水平分布图'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // 清空输入
+        function clearInputs() {
+            document.getElementById('factor-settings').value = '';
+            document.getElementById('response-name').value = '';
+            document.getElementById('results-section').style.display = 'none';
+            if (designChart) {
+                designChart.destroy();
+                designChart = null;
+            }
+        }
+
+        // 导出结果
+        function exportResults() {
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection.style.display === 'none') {
+                alert('请先生成实验设计');
+                return;
+            }
+
+            // 获取结果数据
+            const designType = document.getElementById('result-design-type').textContent;
+            const factors = document.getElementById('result-factors').textContent;
+            const levels = document.getElementById('result-levels').textContent;
+            const baseExperiments = document.getElementById('result-base-experiments').textContent;
+            const replicates = document.getElementById('result-replicates').textContent;
+            const totalExperiments = document.getElementById('result-total-experiments').textContent;
+            const analysisFocus = document.getElementById('result-analysis-focus').textContent;
+            const efficiency = document.getElementById('result-efficiency').textContent;
+
+            // 创建CSV内容
+            let csvContent = '指标,数值\n';
+            csvContent += `实验类型,${designType}\n`;
+            csvContent += `因素数量,${factors}\n`;
+            csvContent += `水平数,${levels}\n`;
+            csvContent += `基础实验次数,${baseExperiments}\n`;
+            csvContent += `重复次数,${replicates}\n`;
+            csvContent += `总实验次数,${totalExperiments}\n`;
+            csvContent += `分析重点,${analysisFocus}\n`;
+            csvContent += `效率,${efficiency}\n\n`;
+            
+            // 添加设计矩阵
+            const tableBody = document.getElementById('design-table-body');
+            const rows = tableBody.querySelectorAll('tr');
+            
+            if (rows.length > 0) {
+                // 添加表头
+                const headers = [];
+                const headerCells = document.querySelectorAll('#design-table-head th');
+                headerCells.forEach(cell => headers.push(cell.textContent));
+                
+                csvContent += headers.join(',') + '\n';
+                
+                // 添加数据行
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    const rowData = [];
+                    cells.forEach(cell => rowData.push(cell.textContent));
+                    csvContent += rowData.join(',') + '\n';
+                });
+            }
+
+            // 下载CSV文件
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'DOE实验设计.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>

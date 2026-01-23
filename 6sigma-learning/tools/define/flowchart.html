@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流程图 - 6 Sigma质量管理学习平台</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tools.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>6 Sigma质量管理学习平台</h1>
+                <p>流程图</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../../index.html">首页</a></li>
+                    <li><a href="../index.html" class="active">工具库</a></li>
+                    <li><a href="../../videos/index.html">视频教程</a></li>
+                    <li><a href="../../cases/index.html">培训案例</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="tool-intro">
+            <h2>流程图 (Flowchart)</h2>
+            <p>流程图是6 Sigma定义阶段的重要工具，用于可视化和分析过程流。通过使用标准化的符号和箭头来表示过程的步骤、决策点和控制流，可以清晰地展示过程的各个步骤及其相互关系，帮助团队理解过程并识别改进机会。</p>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <h4>应用场景</h4>
+                    <ul>
+                        <li>理解当前过程</li>
+                        <li>识别浪费和瓶颈</li>
+                        <li>设计改进过程</li>
+                        <li>培训和教育</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>核心符号</h4>
+                    <ul>
+                        <li><strong>椭圆形</strong>：起始/终止</li>
+                        <li><strong>矩形</strong>：过程/活动</li>
+                        <li><strong>菱形</strong>：决策点</li>
+                        <li><strong>箭头</strong>：流线/方向</li>
+                        <li><strong>圆形</strong>：连接点</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>益处</h4>
+                    <ul>
+                        <li>直观展示过程</li>
+                        <li>识别浪费</li>
+                        <li>标准化过程</li>
+                        <li>促进沟通</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-calculator">
+            <h3>流程图工具</h3>
+            <div class="calculator-grid">
+                <div class="input-group">
+                    <label>流程名称：</label>
+                    <input type="text" id="process-name" placeholder="输入流程名称">
+                </div>
+                <div class="input-group">
+                    <label>流程步骤：</label>
+                    <textarea id="process-steps" rows="10" placeholder="按顺序输入流程步骤，每行一个步骤"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>决策点（可选）：</label>
+                    <textarea id="decision-points" rows="5" placeholder="输入决策点，如：是否满足条件？是/否"></textarea>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="generateFlowchart()" class="btn btn-primary">生成流程图</button>
+                <button onclick="loadSampleData()" class="btn btn-secondary">加载示例数据</button>
+                <button onclick="clearInputs()" class="btn btn-secondary">清空输入</button>
+                <button onclick="exportResults()" class="btn btn-success">导出结果</button>
+            </div>
+        </section>
+
+        <section class="results-section" id="results-section" style="display: none;">
+            <h3>流程图结果</h3>
+            <div class="flowchart-diagram">
+                <div class="flowchart-container">
+                    <div id="flowchart-visual">
+                        <!-- 动态内容 -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-section">
+                <h4>流程步骤表</h4>
+                <div class="table-container">
+                    <table id="flowchart-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>步骤号</th>
+                                <th>步骤描述</th>
+                                <th>步骤类型</th>
+                                <th>责任部门</th>
+                                <th>平均耗时</th>
+                                <th>备注</th>
+                            </tr>
+                        </thead>
+                        <tbody id="flowchart-table-body">
+                            <!-- 动态内容 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="analysis-section">
+                <h4>流程分析</h4>
+                <div class="analysis-grid">
+                    <div class="analysis-card">
+                        <h5>基本统计</h5>
+                        <ul>
+                            <li>总步骤数：<span id="stat-total-steps">0</span></li>
+                            <li>决策点数：<span id="stat-decisions">0</span></li>
+                            <li>循环数：<span id="stat-loops">0</span></li>
+                            <li>平均耗时：<span id="stat-avg-time">0</span></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <h5>流程复杂度</h5>
+                        <ul>
+                            <li>线性度：<span id="stat-linearity">0</span></li>
+                            <li>分支数：<span id="stat-branches">0</span></li>
+                            <li>复杂度评分：<span id="stat-complexity">0</span></li>
+                            <li>可优化点：<span id="stat-optimization">0</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-steps">
+            <h3>操作步骤</h3>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>确定过程边界</h4>
+                        <p>明确流程的起始点和结束点，确定是针对整个流程还是流程中的特定部分进行分析。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>收集过程信息</h4>
+                        <p>与相关人员访谈，观察实际过程，收集文档等，收集足够的过程信息以准确绘制流程图。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>识别主要步骤</h4>
+                        <p>列出过程的主要步骤，从开始到结束。注意决策点和替代路径。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>绘制流程图</h4>
+                        <p>使用标准符号绘制流程图，使用箭头显示流程方向，确保逻辑清晰，布局整洁。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>验证和优化</h4>
+                        <p>与过程参与者验证流程图，确保准确反映实际过程，识别浪费和瓶颈，提出改进建议。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>更新和维护</h4>
+                        <p>当过程发生变化时更新流程图，确保流程图始终反映当前状态。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-notes">
+            <h3>注意事项</h3>
+            <div class="notes-list">
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>保持一致</strong>：使用标准的流程图符号，保持一致的风格和布局，确保流程图易于理解。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>跨职能参与</strong>：流程图应由跨职能团队共同完成，确保所有相关过程都被准确记录。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>避免过度细节</strong>：流程图应保持适当细节水平，过度详细可能导致图过于复杂，难以理解和维护。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>逻辑清晰</strong>：确保流程图逻辑清晰，避免交叉或混乱的流程线，每条流程线应有明确的起点和终点。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">💡</span>
+                    <p><strong>颜色使用</strong>：使用颜色突出关键步骤、决策点或改进区域，提高流程图的视觉效果和易读性。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="related-tools">
+            <h3>相关工具</h3>
+            <div class="related-grid">
+                <div class="related-item">
+                    <h4>SIPOC分析</h4>
+                    <p>过程映射和范围界定</p>
+                    <a href="sipoc.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>项目章程</h4>
+                    <p>定义项目目标和范围</p>
+                    <a href="charter.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>CTQ树</h4>
+                    <p>识别关键质量特性</p>
+                    <a href="ctq.html" class="btn btn-small">查看工具</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-recommendations">
+            <h3>推荐视频教程</h3>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>流程图基础</h4>
+                        <p>YouTube - Six Sigma Institute</p>
+                        <span class="video-duration">15分钟</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=example1" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>流程图实战</h4>
+                        <p>B站 - 质量管理学习</p>
+                        <span class="video-duration">20分钟</span>
+                    </div>
+                    <a href="https://www.bilibili.com/video/BV1example" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 6 Sigma质量管理学习平台. 专注于数据处理和工具应用</p>
+        </div>
+    </footer>
+
+    <script src="../../js/tools.js"></script>
+    <script>
+        // 加载示例数据
+        function loadSampleData() {
+            document.getElementById('process-name').value = '产品订单处理流程';
+            
+            document.getElementById('process-steps').value = `接收订单
+检查库存
+是否满足库存？
+满足：生成发货单
+不满足：通知缺货
+确认订单信息
+生成发票
+发货
+客户签收
+完成订单`;
+            
+            document.getElementById('decision-points').value = `决策点1: 是否满足库存？是/否
+决策点2: 订单信息是否正确？是/否
+决策点3: 客户是否满意？是/否`;
+        }
+
+        // 生成流程图
+        function generateFlowchart() {
+            const processName = document.getElementById('process-name').value.trim();
+            const processSteps = document.getElementById('process-steps').value.trim();
+            const decisionPoints = document.getElementById('decision-points').value.trim();
+
+            // 验证输入
+            if (!processName) {
+                alert('请输入流程名称');
+                return;
+            }
+
+            if (!processSteps) {
+                alert('请输入流程步骤');
+                return;
+            }
+
+            // 解析流程步骤
+            const steps = processSteps.split('\n').map(step => step.trim()).filter(step => step !== '');
+            
+            // 解析决策点
+            const decisions = [];
+            if (decisionPoints) {
+                const lines = decisionPoints.split('\n').map(line => line.trim()).filter(line => line !== '');
+                lines.forEach(line => {
+                    const parts = line.split(':');
+                    if (parts.length === 2) {
+                        decisions.push({
+                            question: parts[0].trim(),
+                            options: parts[1].split('/').map(option => option.trim())
+                        });
+                    }
+                });
+            }
+
+            // 生成流程图
+            generateFlowchartVisual(steps, decisions);
+            
+            // 更新流程表
+            updateFlowchartTable(steps);
+            
+            // 分析流程
+            analyzeFlowchart(steps, decisions);
+            
+            // 显示结果部分
+            document.getElementById('results-section').style.display = 'block';
+        }
+
+        // 生成流程图可视化
+        function generateFlowchartVisual(steps, decisions) {
+            const container = document.getElementById('flowchart-visual');
+            let html = '<div class="flowchart">';
+            
+            // 添加流程标题
+            html += `<div class="flowchart-title">${document.getElementById('process-name').value}</div>`;
+            
+            // 解析决策点索引
+            const decisionIndices = [];
+            for (let i = 0; i < steps.length; i++) {
+                for (let j = 0; j < decisions.length; j++) {
+                    if (steps[i].includes('是否') || steps[i].includes('?') || steps[i].includes('判断')) {
+                        decisionIndices.push(i);
+                        break;
+                    }
+                }
+            }
+            
+            // 生成步骤
+            for (let i = 0; i < steps.length; i++) {
+                const step = steps[i];
+                
+                // 添加步骤
+                if (i === 0) {
+                    // 开始
+                    html += `<div class="flowchart-step flowchart-start">${step}</div>`;
+                } else if (i === steps.length - 1) {
+                    // 结束
+                    html += `<div class="flowchart-arrow">↓</div>`;
+                    html += `<div class="flowchart-step flowchart-end">${step}</div>`;
+                } else if (decisionIndices.includes(i)) {
+                    // 决策点
+                    html += `<div class="flowchart-arrow">↓</div>`;
+                    html += `<div class="flowchart-step flowchart-decision">${step}</div>`;
+                    
+                    // 查找对应的决策信息
+                    let decisionInfo = null;
+                    for (let j = 0; j < decisions.length; j++) {
+                        if (step.toLowerCase().includes(decisions[j].question.toLowerCase().substring(0, 3))) {
+                            decisionInfo = decisions[j];
+                            break;
+                        }
+                    }
+                    
+                    if (decisionInfo) {
+                        html += `<div class="flowchart-decision-branches">`;
+                        html += `<div class="flowchart-branch">`;
+                        html += `<div class="flowchart-arrow">是 →</div>`;
+                        html += `<div class="flowchart-step flowchart-branch-step">${decisionInfo.options[0]}</div>`;
+                        html += `</div>`;
+                        html += `<div class="flowchart-branch">`;
+                        html += `<div class="flowchart-arrow">否 →</div>`;
+                        html += `<div class="flowchart-step flowchart-branch-step">${decisionInfo.options[1]}</div>`;
+                        html += `</div>`;
+                        html += `</div>`;
+                    }
+                } else {
+                    // 普通步骤
+                    html += `<div class="flowchart-arrow">↓</div>`;
+                    html += `<div class="flowchart-step">${step}</div>`;
+                }
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // 更新流程表
+        function updateFlowchartTable(steps) {
+            const tbody = document.getElementById('flowchart-table-body');
+            tbody.innerHTML = '';
+            
+            // 创建表格行
+            for (let i = 0; i < steps.length; i++) {
+                const row = document.createElement('tr');
+                
+                // 步骤号
+                const stepNumberCell = document.createElement('td');
+                stepNumberCell.textContent = i + 1;
+                row.appendChild(stepNumberCell);
+                
+                // 步骤描述
+                const descriptionCell = document.createElement('td');
+                descriptionCell.textContent = steps[i];
+                row.appendChild(descriptionCell);
+                
+                // 步骤类型
+                const typeCell = document.createElement('td');
+                if (i === 0) {
+                    typeCell.textContent = '开始';
+                } else if (i === steps.length - 1) {
+                    typeCell.textContent = '结束';
+                } else if (steps[i].includes('是否') || steps[i].includes('?') || steps[i].includes('判断')) {
+                    typeCell.textContent = '决策';
+                } else {
+                    typeCell.textContent = '过程';
+                }
+                row.appendChild(typeCell);
+                
+                // 责任部门
+                const departmentCell = document.createElement('td');
+                departmentCell.textContent = '待定义';
+                row.appendChild(departmentCell);
+                
+                // 平均耗时
+                const timeCell = document.createElement('td');
+                timeCell.textContent = '待定义';
+                row.appendChild(timeCell);
+                
+                // 备注
+                const notesCell = document.createElement('td');
+                notesCell.textContent = '-';
+                row.appendChild(notesCell);
+                
+                tbody.appendChild(row);
+            }
+        }
+
+        // 分析流程
+        function analyzeFlowchart(steps, decisions) {
+            // 基本统计
+            document.getElementById('stat-total-steps').textContent = steps.length;
+            document.getElementById('stat-decisions').textContent = decisions.length;
+            document.getElementById('stat-loops').textContent = '0'; // 简化实现
+            document.getElementById('stat-avg-time').textContent = '待定义';
+            
+            // 流程复杂度
+            const linearity = calculateLinearity(steps, decisions);
+            const branches = calculateBranches(steps, decisions);
+            const complexity = calculateComplexity(steps, decisions);
+            const optimization = calculateOptimization(steps, decisions);
+            
+            document.getElementById('stat-linearity').textContent = linearity + '%';
+            document.getElementById('stat-branches').textContent = branches;
+            document.getElementById('stat-complexity').textContent = complexity;
+            document.getElementById('stat-optimization').textContent = optimization;
+        }
+
+        // 计算线性度
+        function calculateLinearity(steps, decisions) {
+            // 简化实现：线性度 = (1 - 决策点数/总步骤数) * 100
+            const decisionCount = steps.filter(step => step.includes('是否') || step.includes('?') || step.includes('判断')).length;
+            return Math.max(0, Math.min(100, Math.round((1 - decisionCount / steps.length) * 100)));
+        }
+
+        // 计算分支数
+        function calculateBranches(steps, decisions) {
+            // 简化实现：分支数 = 2^决策点数
+            const decisionCount = steps.filter(step => step.includes('是否') || step.includes('?') || step.includes('判断')).length;
+            return Math.pow(2, decisionCount);
+        }
+
+        // 计算复杂度
+        function calculateComplexity(steps, decisions) {
+            // 简化实现：复杂度 = 步骤数 + 分支数
+            const branches = calculateBranches(steps, decisions);
+            return steps.length + branches;
+        }
+
+        // 计算优化点
+        function calculateOptimization(steps, decisions) {
+            // 简化实现：优化点 = 决策点数 + 可能循环的步骤数
+            const decisionCount = steps.filter(step => step.includes('是否') || step.includes('?') || step.includes('判断')).length;
+            let loopCount = 0;
+            
+            // 简化实现：查找可能表示循环的步骤
+            for (let i = 0; i < steps.length - 1; i++) {
+                if (steps[i].includes('循环') || steps[i].includes('重新') || steps[i+1].includes('返回')) {
+                    loopCount++;
+                }
+            }
+            
+            return decisionCount + loopCount;
+        }
+
+        // 清空输入
+        function clearInputs() {
+            document.getElementById('process-name').value = '';
+            document.getElementById('process-steps').value = '';
+            document.getElementById('decision-points').value = '';
+            document.getElementById('results-section').style.display = 'none';
+        }
+
+        // 导出结果
+        function exportResults() {
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection.style.display === 'none') {
+                alert('请先生成流程图');
+                return;
+            }
+
+            // 获取结果数据
+            const processName = document.getElementById('process-name').value;
+            const processSteps = document.getElementById('process-steps').value;
+            const decisionPoints = document.getElementById('decision-points').value;
+            
+            // 创建CSV内容
+            let csvContent = '流程图分析\n\n';
+            csvContent += `流程名称,${processName}\n\n`;
+            csvContent += `流程步骤,\n${processSteps}\n\n`;
+            csvContent += `决策点,\n${decisionPoints}\n\n`;
+            
+            // 添加流程表
+            csvContent += '步骤号,步骤描述,步骤类型,责任部门,平均耗时,备注\n';
+            const tableRows = document.querySelectorAll('#flowchart-table-body tr');
+            tableRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 0) {
+                    csvContent += `${cells[0].textContent},${cells[1].textContent},${cells[2].textContent},${cells[3].textContent},${cells[4].textContent},${cells[5].textContent}\n`;
+                }
+            });
+            
+            // 添加分析结果
+            csvContent += '\n分析结果,\n';
+            csvContent += `总步骤数,${document.getElementById('stat-total-steps').textContent}\n`;
+            csvContent += `决策点数,${document.getElementById('stat-decisions').textContent}\n`;
+            csvContent += `循环数,${document.getElementById('stat-loops').textContent}\n`;
+            csvContent += `平均耗时,${document.getElementById('stat-avg-time').textContent}\n`;
+            csvContent += `线性度,${document.getElementById('stat-linearity').textContent}\n`;
+            csvContent += `分支数,${document.getElementById('stat-branches').textContent}\n`;
+            csvContent += `复杂度评分,${document.getElementById('stat-complexity').textContent}\n`;
+            csvContent += `可优化点,${document.getElementById('stat-optimization').textContent}\n`;
+
+            // 下载CSV文件
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '流程图分析.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>

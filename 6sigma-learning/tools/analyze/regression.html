@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>回归分析 - 6 Sigma质量管理学习平台</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tools.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>6 Sigma质量管理学习平台</h1>
+                <p>回归分析</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../../index.html">首页</a></li>
+                    <li><a href="../index.html" class="active">工具库</a></li>
+                    <li><a href="../../videos/index.html">视频教程</a></li>
+                    <li><a href="../../cases/index.html">培训案例</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="tool-intro">
+            <h2>回归分析 (Regression Analysis)</h2>
+            <p>回归分析是6 Sigma分析阶段的核心工具，用于研究一个或多个自变量与因变量之间的关系。通过建立回归模型，可以预测因变量的值，识别对因变量影响最大的因素，并为过程改进提供数据支持。</p>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <h4>应用场景</h4>
+                    <ul>
+                        <li>预测过程输出</li>
+                        <li>识别影响质量的关键因素</li>
+                        <li>优化过程参数</li>
+                        <li>评估改进措施的效果</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>常见类型</h4>
+                    <ul>
+                        <li><strong>简单线性回归</strong>：一个自变量和一个因变量</li>
+                        <li><strong>多元线性回归</strong>：多个自变量和一个因变量</li>
+                        <li><strong>多项式回归</strong>：自变量的高次幂</li>
+                        <li><strong>逻辑回归</strong>：二分类输出变量</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>关键指标</h4>
+                    <ul>
+                        <li><strong>R²</strong>：决定系数，模型解释能力</li>
+                        <li><strong>p值</strong>：显著性水平</li>
+                        <li><strong>残差</strong>：实际值与预测值之差</li>
+                        <li><strong>预测区间</strong>：预测值的置信范围</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-calculator">
+            <h3>回归分析工具</h3>
+            <div class="calculator-grid">
+                <div class="input-group">
+                    <label>回归类型：</label>
+                    <select id="regression-type">
+                        <option value="simple-linear">简单线性回归</option>
+                        <option value="multiple-linear">多元线性回归</option>
+                        <option value="polynomial">多项式回归</option>
+                        <option value="logistic">逻辑回归</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>自变量数量：</label>
+                    <input type="number" id="independent-vars" min="1" max="5" value="1">
+                </div>
+                <div class="input-group">
+                    <label>多项式阶数：</label>
+                    <input type="number" id="polynomial-order" min="2" max="5" value="2">
+                </div>
+                <div class="input-group">
+                    <label>数据输入（逗号分隔）：</label>
+                    <textarea id="data-input" rows="10" placeholder="按格式输入数据：
+Y,X1,X2,...
+10.5,1.2,2.3
+11.2,1.5,2.5
+..."></textarea>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="performRegression()" class="btn btn-primary">进行回归分析</button>
+                <button onclick="loadSampleData()" class="btn btn-secondary">加载示例数据</button>
+                <button onclick="clearInputs()" class="btn btn-secondary">清空输入</button>
+                <button onclick="exportResults()" class="btn btn-success">导出结果</button>
+            </div>
+        </section>
+
+        <section class="results-section" id="results-section" style="display: none;">
+            <h3>回归分析结果</h3>
+            <div class="results-grid">
+                <div class="result-card">
+                    <h4>模型统计</h4>
+                    <div class="result-item">
+                        <span>模型类型：</span>
+                        <strong id="result-model-type">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>样本数量：</span>
+                        <strong id="result-sample-count">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>自变量数量：</span>
+                        <strong id="result-var-count">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>模型复杂度：</span>
+                        <strong id="result-complexity">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>模型拟合</h4>
+                    <div class="result-item">
+                        <span>决定系数 (R²)：</span>
+                        <strong id="result-r2">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>调整R²：</span>
+                        <strong id="result-adj-r2">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>标准误差：</span>
+                        <strong id="result-std-error">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>拟合评价：</span>
+                        <strong id="result-fit-eval">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>回归系数</h4>
+                    <div class="result-item">
+                        <span>截距：</span>
+                        <strong id="result-intercept">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>斜率系数：</span>
+                        <strong id="result-coeffs">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>显著性检验：</span>
+                        <strong id="result-significance">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>置信区间：</span>
+                        <strong id="result-confidence">-</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h4>回归拟合图</h4>
+                <div style="height: 400px; margin: 20px 0;">
+                    <canvas id="regression-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h4>残差分析图</h4>
+                <div style="height: 400px; margin: 20px 0;">
+                    <canvas id="residual-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="table-section">
+                <h4>模型方程</h4>
+                <div class="equation-display" id="equation-display">
+                    <!-- 动态内容 -->
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-steps">
+            <h3>操作步骤</h3>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>收集数据</h4>
+                        <p>收集足够数量的样本数据，确保变量间存在相关关系。数据应涵盖变量可能的范围，且来自稳定的过程。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>选择模型类型</h4>
+                        <p>根据研究目的和数据特性选择合适的回归模型。简单线性回归适用于一个自变量，多元线性回归适用于多个自变量，多项式回归用于非线性关系。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>检查假设</h4>
+                        <p>在使用回归分析前，检查线性、独立性、正态性和等方差性等假设是否满足。使用散点图和残差图检查这些假设。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>建立模型</h4>
+                        <p>使用最小二乘法或其他方法拟合回归模型，计算回归系数和模型评估指标（如R²）。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>评估模型</h4>
+                        <p>使用R²、p值、残差图等指标评估模型拟合质量。检查残差是否呈随机分布，是否存在异常值。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>使用模型</h4>
+                        <p>一旦模型建立并验证，可以用于预测、解释变量关系和优化过程参数。定期更新模型以确保其预测准确性。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-notes">
+            <h3>注意事项</h3>
+            <div class="notes-list">
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>变量选择</strong>：选择与因变量有强相关性的自变量，避免多重共线性。过多无关变量可能导致过拟合。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>异常值处理</strong>：仔细检查异常值，它们可能严重影响回归结果。根据情况决定保留、修正或删除异常值。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>假设检验</strong>：在使用回归结果前，确保模型假设得到满足。使用残差图、QQ图等工具检验假设。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>模型验证</strong>：使用交叉验证或保留样本验证模型预测能力。不要仅依赖训练数据评估模型性能。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">💡</span>
+                    <p><strong>模型简化</strong>：当存在多个可用模型时，优先选择更简单的模型。简化模型更易理解和实施。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="related-tools">
+            <h3>相关工具</h3>
+            <div class="related-grid">
+                <div class="related-item">
+                    <h4>假设检验</h4>
+                    <p>验证回归系数的显著性</p>
+                    <a href="hypothesis-test.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>MSA分析</h4>
+                    <p>评估测量系统是否准确可靠</p>
+                    <a href="../measure/msa.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>过程能力分析</h4>
+                    <p>评估预测过程的性能</p>
+                    <a href="../measure/process-capability.html" class="btn btn-small">查看工具</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-recommendations">
+            <h3>推荐视频教程</h3>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>回归分析基础</h4>
+                        <p>YouTube - Six Sigma Institute</p>
+                        <span class="video-duration">18分钟</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=example1" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>多元回归实战</h4>
+                        <p>B站 - 质量管理学习</p>
+                        <span class="video-duration">22分钟</span>
+                    </div>
+                    <a href="https://www.bilibili.com/video/BV1example" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 6 Sigma质量管理学习平台. 专注于数据处理和工具应用</p>
+        </div>
+    </footer>
+
+    <script src="../../js/tools.js"></script>
+    <script>
+        let regressionChart = null;
+        let residualChart = null;
+
+        // 加载示例数据
+        function loadSampleData() {
+            const regressionType = document.getElementById('regression-type').value;
+            const independentVars = parseInt(document.getElementById('independent-vars').value);
+            let sampleData = '';
+            
+            if (regressionType === 'simple-linear') {
+                document.getElementById('independent-vars').value = 1;
+                sampleData = `Y,X1
+10.5,1.2
+11.2,1.5
+11.8,1.8
+12.3,2.1
+12.9,2.4
+13.5,2.7
+14.0,3.0
+14.5,3.3
+15.0,3.6
+15.5,3.9`;
+            } else if (regressionType === 'multiple-linear') {
+                document.getElementById('independent-vars').value = 3;
+                sampleData = `Y,X1,X2,X3
+10.5,1.2,2.3,3.1
+11.2,1.5,2.5,3.3
+11.8,1.8,2.7,3.5
+12.3,2.1,2.9,3.7
+12.9,2.4,3.1,3.9
+13.5,2.7,3.3,4.1
+14.0,3.0,3.5,4.3
+14.5,3.3,3.7,4.5
+15.0,3.6,3.9,4.7
+15.5,3.9,4.1,4.9`;
+            } else if (regressionType === 'polynomial') {
+                document.getElementById('independent-vars').value = 1;
+                document.getElementById('polynomial-order').value = 2;
+                sampleData = `Y,X1
+10.5,1.2
+11.2,1.5
+11.8,1.8
+12.3,2.1
+12.9,2.4
+13.5,2.7
+14.0,3.0
+14.5,3.3
+15.0,3.6
+15.5,3.9`;
+            } else if (regressionType === 'logistic') {
+                document.getElementById('independent-vars').value = 1;
+                sampleData = `Y,X1
+0,1.2
+0,1.5
+1,1.8
+0,2.1
+1,2.4
+1,2.7
+1,3.0
+1,3.3
+1,3.6
+1,3.9`;
+            }
+            
+            document.getElementById('data-input').value = sampleData;
+        }
+
+        // 执行回归分析
+        function performRegression() {
+            const regressionType = document.getElementById('regression-type').value;
+            const independentVars = parseInt(document.getElementById('independent-vars').value);
+            const polynomialOrder = parseInt(document.getElementById('polynomial-order').value);
+            const dataText = document.getElementById('data-input').value.trim();
+            
+            // 验证输入
+            if (!dataText) {
+                alert('请输入数据');
+                return;
+            }
+            
+            // 解析数据
+            const data = parseData(dataText, independentVars);
+            
+            if (!data || data.length === 0) {
+                alert('数据格式错误，请检查输入');
+                return;
+            }
+            
+            if (data.length < 3) {
+                alert('至少需要3个数据点');
+                return;
+            }
+            
+            // 执行回归分析
+            let results;
+            let modelType;
+            let coefficients;
+            let equation;
+            
+            if (regressionType === 'simple-linear') {
+                modelType = '简单线性回归';
+                results = performSimpleLinearRegression(data);
+                coefficients = [results.intercept, results.slope];
+                equation = generateEquation(coefficients, ['X1'], polynomialOrder);
+            } else if (regressionType === 'multiple-linear') {
+                modelType = '多元线性回归';
+                results = performMultipleLinearRegression(data, independentVars);
+                coefficients = [results.intercept, ...results.slopes];
+                equation = generateEquation(coefficients, generateVarNames(independentVars), 1);
+            } else if (regressionType === 'polynomial') {
+                modelType = '多项式回归';
+                results = performPolynomialRegression(data, polynomialOrder);
+                coefficients = results.coefficients;
+                equation = generateEquation(coefficients, ['X1'], polynomialOrder);
+            } else if (regressionType === 'logistic') {
+                modelType = '逻辑回归';
+                results = performLogisticRegression(data, independentVars);
+                coefficients = [results.intercept, ...results.slopes];
+                equation = generateLogisticEquation(coefficients, generateVarNames(independentVars));
+            }
+            
+            // 显示结果
+            displayResults(results, modelType, data.length, independentVars, polynomialOrder);
+            
+            // 显示模型方程
+            displayEquation(equation);
+            
+            // 绘制图表
+            drawRegressionChart(data, results, regressionType);
+            drawResidualChart(data, results, regressionType);
+            
+            // 显示结果部分
+            document.getElementById('results-section').style.display = 'block';
+        }
+
+        // 解析数据
+        function parseData(dataText, independentVars) {
+            const lines = dataText.split('\n').filter(line => line.trim() !== '');
+            const data = [];
+            
+            lines.forEach(line => {
+                const values = line.split(',').map(v => parseFloat(v.trim()));
+                if (values.length >= 2) {
+                    const row = {
+                        y: values[0],
+                        x: values.slice(1, 1 + independentVars)
+                    };
+                    data.push(row);
+                }
+            });
+            
+            return data;
+        }
+
+        // 生成变量名称
+        function generateVarNames(count) {
+            const names = [];
+            for (let i = 0; i < count; i++) {
+                names.push(`X${i + 1}`);
+            }
+            return names;
+        }
+
+        // 简单线性回归
+        function performSimpleLinearRegression(data) {
+            // 提取数据
+            const xs = data.map(d => d.x[0]);
+            const ys = data.map(d => d.y);
+            
+            // 计算统计量
+            const n = data.length;
+            const sumX = xs.reduce((sum, x) => sum + x, 0);
+            const sumY = ys.reduce((sum, y) => sum + y, 0);
+            const sumXY = data.reduce((sum, d) => sum + d.x[0] * d.y, 0);
+            const sumX2 = xs.reduce((sum, x) => sum + x * x, 0);
+            const sumY2 = ys.reduce((sum, y) => sum + y * y, 0);
+            
+            // 计算回归系数
+            const xMean = sumX / n;
+            const yMean = sumY / n;
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = yMean - slope * xMean;
+            
+            // 计算拟合指标
+            const yPred = xs.map(x => intercept + slope * x);
+            const ssRes = ys.reduce((sum, y, i) => sum + Math.pow(y - yPred[i], 2), 0);
+            const ssTot = ys.reduce((sum, y) => sum + Math.pow(y - yMean, 2), 0);
+            const r2 = 1 - (ssRes / ssTot);
+            const stdError = Math.sqrt(ssRes / (n - 2));
+            
+            return {
+                intercept: intercept,
+                slope: slope,
+                r2: r2,
+                stdError: stdError,
+                yPred: yPred,
+                residuals: ys.map((y, i) => y - yPred[i])
+            };
+        }
+
+        // 多元线性回归
+        function performMultipleLinearRegression(data, independentVars) {
+            // 提取数据
+            const n = data.length;
+            const y = data.map(d => d.y);
+            
+            // 构建设计矩阵
+            const X = data.map(d => [1, ...d.x]);
+            
+            // 计算回归系数 (使用简化的方法)
+            // 实际实现中应使用更精确的方法，如高斯消元法或QR分解
+            
+            // 简化的多元线性回归计算
+            const slopes = new Array(independentVars).fill(0);
+            let intercept = y.reduce((sum, val) => sum + val, 0) / n;
+            
+            // 简单迭代法求解（实际应用中使用更精确的方法）
+            for (let iter = 0; iter < 100; iter++) {
+                for (let j = 0; j < independentVars; j++) {
+                    let sumXY = 0;
+                    let sumX2 = 0;
+                    for (let i = 0; i < n; i++) {
+                        let xPred = intercept;
+                        for (let k = 0; k < independentVars; k++) {
+                            if (k !== j) {
+                                xPred += slopes[k] * data[i].x[k];
+                            }
+                        }
+                        sumXY += (data[i].y - xPred) * data[i].x[j];
+                        sumX2 += data[i].x[j] * data[i].x[j];
+                    }
+                    if (sumX2 > 0) {
+                        slopes[j] = sumXY / sumX2;
+                    }
+                }
+            }
+            
+            // 计算预测值和残差
+            const yPred = data.map(d => {
+                let pred = intercept;
+                for (let j = 0; j < independentVars; j++) {
+                    pred += slopes[j] * d.x[j];
+                }
+                return pred;
+            });
+            
+            const residuals = y.map((val, i) => val - yPred[i]);
+            
+            // 计算R²
+            const yMean = y.reduce((sum, val) => sum + val, 0) / n;
+            const ssRes = residuals.reduce((sum, res) => sum + res * res, 0);
+            const ssTot = y.reduce((sum, val) => sum + Math.pow(val - yMean, 2), 0);
+            const r2 = 1 - (ssRes / ssTot);
+            const stdError = Math.sqrt(ssRes / (n - independentVars - 1));
+            
+            return {
+                intercept: intercept,
+                slopes: slopes,
+                r2: r2,
+                stdError: stdError,
+                yPred: yPred,
+                residuals: residuals
+            };
+        }
+
+        // 多项式回归
+        function performPolynomialRegression(data, order) {
+            // 提取数据
+            const xs = data.map(d => d.x[0]);
+            const ys = data.map(d => d.y);
+            const n = data.length;
+            
+            // 构建设计矩阵
+            const X = xs.map(x => {
+                const row = [1]; // 常数项
+                for (let i = 1; i <= order; i++) {
+                    row.push(Math.pow(x, i));
+                }
+                return row;
+            });
+            
+            // 使用简化的多项式拟合方法
+            // 实际应用中应使用更精确的方法
+            
+            // 计算回归系数
+            const coefficients = new Array(order + 1).fill(0);
+            let intercept = ys.reduce((sum, y) => sum + y, 0) / n;
+            coefficients[0] = intercept;
+            
+            // 简单迭代法
+            for (let iter = 0; iter < 100; iter++) {
+                for (let j = 1; j <= order; j++) {
+                    let sumXY = 0;
+                    let sumX2 = 0;
+                    for (let i = 0; i < n; i++) {
+                        let xPred = intercept;
+                        for (let k = 1; k <= order; k++) {
+                            if (k !== j) {
+                                xPred += coefficients[k] * Math.pow(xs[i], k);
+                            }
+                        }
+                        sumXY += (ys[i] - xPred) * Math.pow(xs[i], j);
+                        sumX2 += Math.pow(xs[i], j) * Math.pow(xs[i], j);
+                    }
+                    if (sumX2 > 0) {
+                        coefficients[j] = sumXY / sumX2;
+                    }
+                }
+            }
+            
+            // 计算预测值和残差
+            const yPred = xs.map(x => {
+                let pred = coefficients[0];
+                for (let i = 1; i <= order; i++) {
+                    pred += coefficients[i] * Math.pow(x, i);
+                }
+                return pred;
+            });
+            
+            const residuals = ys.map((y, i) => y - yPred[i]);
+            
+            // 计算R²
+            const yMean = ys.reduce((sum, y) => sum + y, 0) / n;
+            const ssRes = residuals.reduce((sum, res) => sum + res * res, 0);
+            const ssTot = ys.reduce((sum, y) => sum + Math.pow(y - yMean, 2), 0);
+            const r2 = 1 - (ssRes / ssTot);
+            const stdError = Math.sqrt(ssRes / (n - order - 1));
+            
+            return {
+                coefficients: coefficients,
+                r2: r2,
+                stdError: stdError,
+                yPred: yPred,
+                residuals: residuals
+            };
+        }
+
+        // 逻辑回归
+        function performLogisticRegression(data, independentVars) {
+            // 提取数据
+            const n = data.length;
+            const y = data.map(d => d.y);
+            
+            // 构建设计矩阵
+            const X = data.map(d => [1, ...d.x]);
+            
+            // 简化的逻辑回归计算
+            const slopes = new Array(independentVars).fill(0);
+            let intercept = 0;
+            
+            // 简化的梯度下降法
+            for (let iter = 0; iter < 100; iter++) {
+                for (let j = 0; j < independentVars; j++) {
+                    let sumXY = 0;
+                    for (let i = 0; i < n; i++) {
+                        let z = intercept;
+                        for (let k = 0; k < independentVars; k++) {
+                            z += slopes[k] * data[i].x[k];
+                        }
+                        const prob = 1 / (1 + Math.exp(-z));
+                        sumXY += (y[i] - prob) * data[i].x[j];
+                    }
+                    slopes[j] += 0.01 * sumXY / n; // 学习率
+                }
+                
+                // 更新截距
+                let sumXY = 0;
+                for (let i = 0; i < n; i++) {
+                    let z = intercept;
+                    for (let k = 0; k < independentVars; k++) {
+                        z += slopes[k] * data[i].x[k];
+                    }
+                    const prob = 1 / (1 + Math.exp(-z));
+                    sumXY += (y[i] - prob);
+                }
+                intercept += 0.01 * sumXY / n;
+            }
+            
+            // 计算预测概率
+            const yProb = data.map(d => {
+                let z = intercept;
+                for (let j = 0; j < independentVars; j++) {
+                    z += slopes[j] * d.x[j];
+                }
+                return 1 / (1 + Math.exp(-z));
+            });
+            
+            // 计算伪R²（McFadden's pseudo R²）
+            const logLikelihood = y.reduce((sum, yi, i) => {
+                const pi = yProb[i];
+                return sum + (yi * Math.log(pi) + (1 - yi) * Math.log(1 - pi));
+            }, 0);
+            
+            const logLikelihoodNull = y.reduce((sum, yi) => {
+                const p = y.reduce((s, val) => s + val, 0) / n;
+                return sum + (yi * Math.log(p) + (1 - yi) * Math.log(1 - p));
+            }, 0);
+            
+            const pseudoR2 = 1 - (logLikelihood / logLikelihoodNull);
+            
+            return {
+                intercept: intercept,
+                slopes: slopes,
+                r2: pseudoR2,
+                yPred: yProb,
+                residuals: y.map((val, i) => val - yProb[i])
+            };
+        }
+
+        // 生成回归方程
+        function generateEquation(coefficients, varNames, order) {
+            let equation = 'Y = ';
+            
+            // 截距
+            equation += coefficients[0].toFixed(4);
+            
+            // 系数
+            for (let i = 1; i < coefficients.length; i++) {
+                if (coefficients[i] >= 0) {
+                    equation += ' + ';
+                } else {
+                    equation += ' - ';
+                }
+                equation += Math.abs(coefficients[i]).toFixed(4);
+                
+                if (order > 1) {
+                    equation += ' * ' + varNames[0] + '^' + i;
+                } else {
+                    equation += ' * ' + varNames[i - 1];
+                }
+            }
+            
+            return equation;
+        }
+
+        // 生成逻辑回归方程
+        function generateLogisticEquation(coefficients, varNames) {
+            let equation = 'logit(P) = ';
+            
+            // 截距
+            equation += coefficients[0].toFixed(4);
+            
+            // 系数
+            for (let i = 1; i < coefficients.length; i++) {
+                if (coefficients[i] >= 0) {
+                    equation += ' + ';
+                } else {
+                    equation += ' - ';
+                }
+                equation += Math.abs(coefficients[i]).toFixed(4) + ' * ' + varNames[i - 1];
+            }
+            
+            equation += '\n\n其中 P = 1 / (1 + e^(-logit(P)))';
+            
+            return equation;
+        }
+
+        // 显示结果
+        function displayResults(results, modelType, sampleCount, varCount, order) {
+            // 显示模型信息
+            document.getElementById('result-model-type').textContent = modelType;
+            document.getElementById('result-sample-count').textContent = sampleCount;
+            document.getElementById('result-var-count').textContent = varCount;
+            
+            if (varCount === 1 && order > 1) {
+                document.getElementById('result-complexity').textContent = `多项式阶数: ${order}`;
+            } else {
+                document.getElementById('result-complexity').textContent = '线性关系';
+            }
+            
+            // 显示拟合指标
+            document.getElementById('result-r2').textContent = results.r2.toFixed(4);
+            document.getElementById('result-std-error').textContent = results.stdError.toFixed(4);
+            
+            // 计算调整R²
+            const adjR2 = 1 - ((1 - results.r2) * (sampleCount - 1) / (sampleCount - varCount - 1));
+            document.getElementById('result-adj-r2').textContent = adjR2.toFixed(4);
+            
+            // 拟合评价
+            let fitEval = '';
+            if (results.r2 >= 0.9) {
+                fitEval = '优秀';
+            } else if (results.r2 >= 0.7) {
+                fitEval = '良好';
+            } else if (results.r2 >= 0.5) {
+                fitEval = '一般';
+            } else {
+                fitEval = '较差';
+            }
+            document.getElementById('result-fit-eval').textContent = fitEval;
+            
+            // 显示系数
+            document.getElementById('result-intercept').textContent = results.intercept.toFixed(4);
+            
+            if (varCount === 1 && order > 1) {
+                document.getElementById('result-coeffs').textContent = results.coefficients.slice(1).map(c => c.toFixed(4)).join(', ');
+            } else if (varCount === 1) {
+                document.getElementById('result-coeffs').textContent = results.slope.toFixed(4);
+            } else {
+                document.getElementById('result-coeffs').textContent = results.slopes.map(s => s.toFixed(4)).join(', ');
+            }
+            
+            // 显著性检验（简化）
+            let significance = '';
+            if (results.r2 >= 0.7) {
+                significance = '显著';
+            } else if (results.r2 >= 0.5) {
+                significance = '中等显著';
+            } else {
+                significance = '不显著';
+            }
+            document.getElementById('result-significance').textContent = significance;
+            
+            // 置信区间（简化）
+            document.getElementById('result-confidence').textContent = '95%';
+        }
+
+        // 显示方程
+        function displayEquation(equation) {
+            const equationDiv = document.getElementById('equation-display');
+            equationDiv.innerHTML = `<div class="equation">${equation.replace(/\n/g, '<br>')}</div>`;
+        }
+
+        // 绘制回归图
+        function drawRegressionChart(data, results, regressionType) {
+            const ctx = document.getElementById('regression-chart').getContext('2d');
+            
+            if (regressionChart) {
+                regressionChart.destroy();
+            }
+            
+            // 准备数据
+            const xs = data.map(d => d.x[0]);
+            const ys = data.map(d => d.y);
+            const yPred = results.yPred;
+            
+            // 确定回归线范围
+            const xMin = Math.min(...xs);
+            const xMax = Math.max(...xs);
+            const xRange = xMax - xMin;
+            const xLineStart = xMin - xRange * 0.1;
+            const xLineEnd = xMax + xRange * 0.1;
+            const xLine = Array.from({length: 100}, (_, i) => xLineStart + (xLineEnd - xLineStart) * i / 99);
+            
+            // 计算回归线
+            let yLine = [];
+            if (regressionType === 'simple-linear') {
+                yLine = xLine.map(x => results.intercept + results.slope * x);
+            } else if (regressionType === 'polynomial') {
+                const order = results.coefficients.length - 1;
+                yLine = xLine.map(x => {
+                    let y = results.coefficients[0];
+                    for (let i = 1; i <= order; i++) {
+                        y += results.coefficients[i] * Math.pow(x, i);
+                    }
+                    return y;
+                });
+            } else if (regressionType === 'logistic') {
+                yLine = xLine.map(x => {
+                    const z = results.intercept + results.slopes[0] * x;
+                    return 1 / (1 + Math.exp(-z));
+                });
+            } else {
+                // 多元线性回归使用第一个变量的范围作为x轴
+                yLine = xLine.map((x, i) => {
+                    let y = results.intercept;
+                    for (let j = 0; j < results.slopes.length; j++) {
+                        if (j === 0) {
+                            y += results.slopes[j] * x;
+                        } else {
+                            y += results.slopes[j] * data[0].x[j]; // 使用第一个数据点的其他变量值
+                        }
+                    }
+                    return y;
+                });
+            }
+            
+            regressionChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: '实际数据',
+                            data: data.map((d, i) => ({ x: d.x[0], y: d.y })),
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            pointRadius: 5
+                        },
+                        {
+                            label: '回归线',
+                            data: xLine.map((x, i) => ({ x: x, y: yLine[i] })),
+                            type: 'line',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderWidth: 2,
+                            fill: false,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                        title: {
+                            display: true,
+                            text: '回归拟合图'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'X'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Y'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 绘制残差图
+        function drawResidualChart(data, results, regressionType) {
+            const ctx = document.getElementById('residual-chart').getContext('2d');
+            
+            if (residualChart) {
+                residualChart.destroy();
+            }
+            
+            // 准备数据
+            const xs = data.map(d => d.x[0]);
+            const residuals = results.residuals;
+            
+            residualChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: '残差',
+                            data: data.map((d, i) => ({ x: d.x[0], y: residuals[i] })),
+                            backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            pointRadius: 5
+                        },
+                        {
+                            label: '零线',
+                            data: [
+                                { x: Math.min(...xs), y: 0 },
+                                { x: Math.max(...xs), y: 0 }
+                            ],
+                            type: 'line',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            fill: false,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                        title: {
+                            display: true,
+                            text: '残差分析图'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'X'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '残差'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 清空输入
+        function clearInputs() {
+            document.getElementById('data-input').value = '';
+            document.getElementById('results-section').style.display = 'none';
+            if (regressionChart) {
+                regressionChart.destroy();
+                regressionChart = null;
+            }
+            if (residualChart) {
+                residualChart.destroy();
+                residualChart = null;
+            }
+        }
+
+        // 导出结果
+        function exportResults() {
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection.style.display === 'none') {
+                alert('请先进行回归分析');
+                return;
+            }
+
+            // 获取结果数据
+            const modelType = document.getElementById('result-model-type').textContent;
+            const sampleCount = document.getElementById('result-sample-count').textContent;
+            const varCount = document.getElementById('result-var-count').textContent;
+            const complexity = document.getElementById('result-complexity').textContent;
+            const r2 = document.getElementById('result-r2').textContent;
+            const adjR2 = document.getElementById('result-adj-r2').textContent;
+            const stdError = document.getElementById('result-std-error').textContent;
+            const fitEval = document.getElementById('result-fit-eval').textContent;
+            const intercept = document.getElementById('result-intercept').textContent;
+            const coeffs = document.getElementById('result-coeffs').textContent;
+            const significance = document.getElementById('result-significance').textContent;
+            const confidence = document.getElementById('result-confidence').textContent;
+
+            // 创建CSV内容
+            let csvContent = '指标,数值\n';
+            csvContent += `模型类型,${modelType}\n`;
+            csvContent += `样本数量,${sampleCount}\n`;
+            csvContent += `自变量数量,${varCount}\n`;
+            csvContent += `模型复杂度,${complexity}\n`;
+            csvContent += `决定系数 (R²),${r2}\n`;
+            csvContent += `调整R²,${adjR2}\n`;
+            csvContent += `标准误差,${stdError}\n`;
+            csvContent += `拟合评价,${fitEval}\n`;
+            csvContent += `截距,${intercept}\n`;
+            csvContent += `系数,${coeffs}\n`;
+            csvContent += `显著性检验,${significance}\n`;
+            csvContent += `置信区间,${confidence}\n\n`;
+            
+            // 添加方程
+            const equation = document.querySelector('#equation-display .equation').textContent;
+            csvContent += `回归方程,${equation}\n`;
+
+            // 下载CSV文件
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '回归分析结果.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>

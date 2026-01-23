@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSA测量系统分析 - 6 Sigma质量管理学习平台</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/tools.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>6 Sigma质量管理学习平台</h1>
+                <p>MSA测量系统分析</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../../index.html">首页</a></li>
+                    <li><a href="../index.html" class="active">工具库</a></li>
+                    <li><a href="../../videos/index.html">视频教程</a></li>
+                    <li><a href="../../cases/index.html">培训案例</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="tool-intro">
+            <h2>MSA测量系统分析 (Measurement System Analysis)</h2>
+            <p>MSA是6 Sigma测量阶段的核心工具，用于评估测量系统是否满足质量要求。通过分析测量系统的重复性（Repeatability）、再现性（Reproducibility）和偏倚等特性，确保测量数据准确可靠。</p>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <h4>应用场景</h4>
+                    <ul>
+                        <li>验证新测量系统的适用性</li>
+                        <li>比较不同测量系统的性能</li>
+                        <li>监控测量系统的长期稳定性</li>
+                        <li>确定测量系统的改进优先级</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>核心指标</h4>
+                    <ul>
+                        <li><strong>GR&R</strong>：重复性和再现性研究</li>
+                        <li><strong>偏倚 (Bias)</strong>：测量值的系统误差</li>
+                        <li><strong>线性 (Linearity)</strong>：整个量程的准确度</li>
+                        <li><strong>稳定性 (Stability)</strong>：长期测量性能</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h4>判断标准</h4>
+                    <ul>
+                        <li>GR&R < 10%：测量系统优秀</li>
+                        <li>10% ≤ GR&R < 30%：测量系统可接受</li>
+                        <li>GR&R ≥ 30%：测量系统不可接受</li>
+                        <li>偏倚、线性、稳定性：越低越好</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-calculator">
+            <h3>GR&R分析</h3>
+            <div class="calculator-grid">
+                <div class="input-group">
+                    <label>操作员数量：</label>
+                    <input type="number" id="operators" min="2" max="5" value="2">
+                </div>
+                <div class="input-group">
+                    <label>零件数量：</label>
+                    <input type="number" id="parts" min="3" max="10" value="5">
+                </div>
+                <div class="input-group">
+                    <label>重复测量次数：</label>
+                    <input type="number" id="replicates" min="2" max="5" value="2">
+                </div>
+                <div class="input-group">
+                    <label>数据输入：</label>
+                    <textarea id="data-input" rows="10" placeholder="按格式输入数据：
+操作员A,零件1,测量1,测量2
+操作员A,零件2,测量1,测量2
+操作员B,零件1,测量1,测量2
+..."></textarea>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="calculateGRR()" class="btn btn-primary">计算GR&R</button>
+                <button onclick="loadSampleData()" class="btn btn-secondary">加载示例数据</button>
+                <button onclick="clearInputs()" class="btn btn-secondary">清空输入</button>
+                <button onclick="exportResults()" class="btn btn-success">导出结果</button>
+            </div>
+        </section>
+
+        <section class="results-section" id="results-section" style="display: none;">
+            <h3>分析结果</h3>
+            <div class="results-grid">
+                <div class="result-card">
+                    <h4>重复性分析</h4>
+                    <div class="result-item">
+                        <span>重复性(Repeatability) %：</span>
+                        <strong id="result-repeatability">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>评价：</span>
+                        <strong id="result-repeatability-eval">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>再现性分析</h4>
+                    <div class="result-item">
+                        <span>再现性(Reproducibility) %：</span>
+                        <strong id="result-reproducibility">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>评价：</span>
+                        <strong id="result-reproducibility-eval">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>GR&R分析</h4>
+                    <div class="result-item">
+                        <span>GR&R %：</span>
+                        <strong id="result-grr">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>评价：</span>
+                        <strong id="result-grr-eval">-</strong>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>部件间变化</h4>
+                    <div class="result-item">
+                        <span>部件变化 %：</span>
+                        <strong id="result-parts">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>总变化 %：</span>
+                        <strong id="result-total">-</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h4>变异源图表</h4>
+                <div style="height: 400px; margin: 20px 0;">
+                    <canvas id="grr-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h4>部件间比较图</h4>
+                <div style="height: 400px; margin: 20px 0;">
+                    <canvas id="parts-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-steps">
+            <h3>操作步骤</h3>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>准备研究</h4>
+                        <p>选择有代表性的零件（通常5-10个），确保零件范围覆盖整个生产过程。确定操作员数量（通常2-3人）和测量重复次数（通常2-3次）。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>收集数据</h4>
+                        <p>随机选择零件进行测量，每个操作员独立测量所有零件。记录所有测量值，确保测量过程符合标准操作程序。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>计算GR&R</h4>
+                        <p>使用方差分析（ANOVA）方法计算重复性、再现性和部件变异。GR&R = √(重复性² + 再现性²)。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>评估结果</h4>
+                        <p>根据GR&R百分比判断测量系统性能：小于10%为优秀，10-30%为可接受，大于30%为不可接受。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>改进措施</h4>
+                        <p>如果GR&R过高，需要分析原因（操作员培训、设备校准、环境控制等），制定改进计划并重新评估。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-notes">
+            <h3>注意事项</h3>
+            <div class="notes-list">
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>随机化</strong>：测量顺序必须随机化，避免系统误差影响结果。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>操作员</strong>：选择有代表性的操作员，包括新手和经验丰富的操作员。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>零件选择</strong>：零件应覆盖整个生产范围，包括低、中、高值零件。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">⚠️</span>
+                    <p><strong>样本量</strong>：适当的样本量对准确评估至关重要，过小可能导致不准确的结果。</p>
+                </div>
+                <div class="note-item">
+                    <span class="note-icon">💡</span>
+                    <p><strong>软件工具</strong>：Minitab、JMP、Excel等软件可以简化MSA分析过程。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="related-tools">
+            <h3>相关工具</h3>
+            <div class="related-grid">
+                <div class="related-item">
+                    <h4>过程能力分析</h4>
+                    <p>评估过程是否满足规格要求</p>
+                    <a href="process-capability.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>SPC控制图</h4>
+                    <p>监控过程稳定性</p>
+                    <a href="../control/spc.html" class="btn btn-small">查看工具</a>
+                </div>
+                <div class="related-item">
+                    <h4>假设检验</h4>
+                    <p>比较测量系统的差异</p>
+                    <a href="../analyze/hypothesis-test.html" class="btn btn-small">查看工具</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-recommendations">
+            <h3>推荐视频教程</h3>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>MSA测量系统分析入门</h4>
+                        <p>YouTube - Six Sigma Institute</p>
+                        <span class="video-duration">18分钟</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=example1" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">📊</div>
+                    <div class="video-info">
+                        <h4>GR&R分析实战</h4>
+                        <p>B站 - 质量管理学习</p>
+                        <span class="video-duration">25分钟</span>
+                    </div>
+                    <a href="https://www.bilibili.com/video/BV1example" target="_blank" class="btn btn-small">观看视频</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 6 Sigma质量管理学习平台. 专注于数据处理和工具应用</p>
+        </div>
+    </footer>
+
+    <script src="../../js/tools.js"></script>
+    <script>
+        let grrChart = null;
+        let partsChart = null;
+
+        // 加载示例数据
+        function loadSampleData() {
+            const sampleData = `操作员A,零件1,10.15,10.18
+操作员A,零件2,10.52,10.50
+操作员A,零件3,10.78,10.75
+操作员A,零件4,11.02,11.05
+操作员A,零件5,11.35,11.33
+操作员B,零件1,10.22,10.19
+操作员B,零件2,10.48,10.51
+操作员B,零件3,10.81,10.79
+操作员B,零件4,10.98,11.01
+操作员B,零件5,11.38,11.36`;
+            
+            document.getElementById('data-input').value = sampleData;
+        }
+
+        // 计算GR&R
+        function calculateGRR() {
+            const dataText = document.getElementById('data-input').value.trim();
+            if (!dataText) {
+                alert('请输入数据');
+                return;
+            }
+
+            const lines = dataText.split('\n').filter(line => line.trim() !== '');
+            if (lines.length === 0) {
+                alert('请输入有效数据');
+                return;
+            }
+
+            // 解析数据
+            const data = {};
+            lines.forEach(line => {
+                const parts = line.split(',');
+                if (parts.length < 4) return;
+                
+                const operator = parts[0].trim();
+                const part = parts[1].trim();
+                const measurements = parts.slice(2).map(val => parseFloat(val.trim())).filter(val => !isNaN(val));
+                
+                if (!data[operator]) data[operator] = {};
+                if (!data[operator][part]) data[operator][part] = [];
+                data[operator][part].push(...measurements);
+            });
+
+            // 获取操作员和零件列表
+            const operators = Object.keys(data);
+            const parts = Object.keys(data[operators[0]]);
+
+            if (operators.length < 2) {
+                alert('至少需要2个操作员的数据');
+                return;
+            }
+
+            if (parts.length < 3) {
+                alert('至少需要3个零件的数据');
+                return;
+            }
+
+            // 计算平均值
+            function avg(arr) {
+                return arr.reduce((sum, val) => sum + val, 0) / arr.length;
+            }
+
+            // 计算总和
+            function sum(arr) {
+                return arr.reduce((sum, val) => sum + val, 0);
+            }
+
+            // 计算每个操作员对每个零件的平均测量值
+            const operatorPartAvg = {};
+            operators.forEach(op => {
+                operatorPartAvg[op] = {};
+                parts.forEach(p => {
+                    if (data[op][p]) {
+                        operatorPartAvg[op][p] = avg(data[op][p]);
+                    }
+                });
+            });
+
+            // 计算每个操作员的平均值
+            const operatorAvg = {};
+            operators.forEach(op => {
+                const allMeasurements = parts.map(p => operatorPartAvg[op][p]).filter(val => !isNaN(val));
+                operatorAvg[op] = avg(allMeasurements);
+            });
+
+            // 计算每个零件的平均值
+            const partAvg = {};
+            parts.forEach(p => {
+                const allMeasurements = operators.map(op => operatorPartAvg[op][p]).filter(val => !isNaN(val));
+                partAvg[p] = avg(allMeasurements);
+            });
+
+            // 计算总平均值
+            const allMeasurements = [];
+            operators.forEach(op => {
+                parts.forEach(p => {
+                    if (data[op][p]) {
+                        allMeasurements.push(...data[op][p]);
+                    }
+                });
+            });
+            const totalAvg = avg(allMeasurements);
+
+            // 计算平方和
+            let SS_op = 0;
+            let SS_part = 0;
+            let SS_op_part = 0;
+            let SS_error = 0;
+            let SS_total = 0;
+
+            // 计算操作员平方和
+            operators.forEach(op => {
+                const count = parts.length * (data[op][parts[0]] ? data[op][parts[0]].length : 0);
+                SS_op += count * Math.pow(operatorAvg[op] - totalAvg, 2);
+            });
+
+            // 计算零件平方和
+            parts.forEach(p => {
+                const count = operators.length * (data[operators[0]][p] ? data[operators[0]][p].length : 0);
+                SS_part += count * Math.pow(partAvg[p] - totalAvg, 2);
+            });
+
+            // 计算操作员×零件交互作用平方和
+            operators.forEach(op => {
+                parts.forEach(p => {
+                    if (data[op][p]) {
+                        const count = data[op][p].length;
+                        const interaction = operatorAvg[op] + partAvg[p] - totalAvg;
+                        SS_op_part += count * Math.pow(operatorPartAvg[op][p] - interaction, 2);
+                    }
+                });
+            });
+
+            // 计算误差平方和
+            operators.forEach(op => {
+                parts.forEach(p => {
+                    if (data[op][p]) {
+                        const mean = operatorPartAvg[op][p];
+                        data[op][p].forEach(value => {
+                            SS_error += Math.pow(value - mean, 2);
+                        });
+                    }
+                });
+            });
+
+            // 计算总平方和
+            allMeasurements.forEach(value => {
+                SS_total += Math.pow(value - totalAvg, 2);
+            });
+
+            // 计算自由度
+            const df_op = operators.length - 1;
+            const df_part = parts.length - 1;
+            const df_op_part = df_op * df_part;
+            const df_error = operators.length * parts.length * (data[operators[0]][parts[0]].length - 1);
+            const df_total = allMeasurements.length - 1;
+
+            // 计算均方
+            const MS_op = SS_op / df_op;
+            const MS_part = SS_part / df_part;
+            const MS_op_part = SS_op_part / df_op_part;
+            const MS_error = SS_error / df_error;
+
+            // 计算变异分量
+            const sigma_op_part_sq = Math.max(0, (MS_op_part - MS_error) / (data[operators[0]][parts[0]].length));
+            const sigma_op_sq = Math.max(0, (MS_op - MS_op_part) / (parts.length * (data[operators[0]][parts[0]].length)));
+            const sigma_error_sq = MS_error;
+            const sigma_part_sq = Math.max(0, (MS_part - MS_op_part) / (operators.length * (data[operators[0]][parts[0]].length)));
+
+            // 计算GR&R
+            const sigma_repeatability = Math.sqrt(sigma_error_sq);
+            const sigma_reproducibility = Math.sqrt(sigma_op_sq + sigma_op_part_sq);
+            const sigma_grr = Math.sqrt(sigma_repeatability * sigma_repeatability + sigma_reproducibility * sigma_reproducibility);
+            const sigma_parts = Math.sqrt(sigma_part_sq);
+            const sigma_total = Math.sqrt(sigma_grr * sigma_grr + sigma_parts * sigma_parts);
+
+            // 转换为百分比
+            const repeatabilityPct = (sigma_repeatability / sigma_total) * 100;
+            const reproducibilityPct = (sigma_reproducibility / sigma_total) * 100;
+            const grrPct = (sigma_grr / sigma_total) * 100;
+            const partsPct = (sigma_parts / sigma_total) * 100;
+
+            // 显示结果
+            document.getElementById('result-repeatability').textContent = repeatabilityPct.toFixed(2) + '%';
+            document.getElementById('result-reproducibility').textContent = reproducibilityPct.toFixed(2) + '%';
+            document.getElementById('result-grr').textContent = grrPct.toFixed(2) + '%';
+            document.getElementById('result-parts').textContent = partsPct.toFixed(2) + '%';
+            document.getElementById('result-total').textContent = '100.00%';
+
+            // 评价结果
+            let repeatabilityEval = '';
+            if (repeatabilityPct < 10) {
+                repeatabilityEval = '优秀';
+                document.getElementById('result-repeatability-eval').style.color = 'green';
+            } else if (repeatabilityPct < 30) {
+                repeatabilityEval = '可接受';
+                document.getElementById('result-repeatability-eval').style.color = 'orange';
+            } else {
+                repeatabilityEval = '不可接受';
+                document.getElementById('result-repeatability-eval').style.color = 'red';
+            }
+            document.getElementById('result-repeatability-eval').textContent = repeatabilityEval;
+
+            let reproducibilityEval = '';
+            if (reproducibilityPct < 10) {
+                reproducibilityEval = '优秀';
+                document.getElementById('result-reproducibility-eval').style.color = 'green';
+            } else if (reproducibilityPct < 30) {
+                reproducibilityEval = '可接受';
+                document.getElementById('result-reproducibility-eval').style.color = 'orange';
+            } else {
+                reproducibilityEval = '不可接受';
+                document.getElementById('result-reproducibility-eval').style.color = 'red';
+            }
+            document.getElementById('result-reproducibility-eval').textContent = reproducibilityEval;
+
+            let grrEval = '';
+            if (grrPct < 10) {
+                grrEval = '优秀';
+                document.getElementById('result-grr-eval').style.color = 'green';
+            } else if (grrPct < 30) {
+                grrEval = '可接受';
+                document.getElementById('result-grr-eval').style.color = 'orange';
+            } else {
+                grrEval = '不可接受';
+                document.getElementById('result-grr-eval').style.color = 'red';
+            }
+            document.getElementById('result-grr-eval').textContent = grrEval;
+
+            // 显示结果部分
+            document.getElementById('results-section').style.display = 'block';
+
+            // 绘制图表
+            drawGRRChart(repeatabilityPct, reproducibilityPct, partsPct);
+            drawPartsChart(partAvg, operators, parts);
+        }
+
+        // 绘制GR&R图表
+        function drawGRRChart(repeatability, reproducibility, parts) {
+            const ctx = document.getElementById('grr-chart').getContext('2d');
+            
+            if (grrChart) {
+                grrChart.destroy();
+            }
+
+            grrChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['重复性', '再现性', '部件变化'],
+                    datasets: [{
+                        label: '变异百分比',
+                        data: [repeatability, reproducibility, parts],
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 159, 64, 0.8)',
+                            'rgba(75, 192, 192, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: '变异源分析'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 绘制零件比较图
+        function drawPartsChart(partAvg, operators, parts) {
+            const ctx = document.getElementById('parts-chart').getContext('2d');
+            
+            if (partsChart) {
+                partsChart.destroy();
+            }
+
+            const datasets = operators.map((op, index) => {
+                const colors = [
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 159, 64, 0.8)',
+                    'rgba(75, 192, 192, 0.8)'
+                ];
+                
+                return {
+                    label: op,
+                    data: parts.map(p => partAvg[p]),
+                    borderColor: colors[index],
+                    backgroundColor: colors[index],
+                    fill: false
+                };
+            });
+
+            partsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: parts,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '各操作员对各零件的测量平均值'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // 清空输入
+        function clearInputs() {
+            document.getElementById('data-input').value = '';
+            document.getElementById('results-section').style.display = 'none';
+            if (grrChart) {
+                grrChart.destroy();
+                grrChart = null;
+            }
+            if (partsChart) {
+                partsChart.destroy();
+                partsChart = null;
+            }
+        }
+
+        // 导出结果
+        function exportResults() {
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection.style.display === 'none') {
+                alert('请先计算结果');
+                return;
+            }
+
+            // 获取结果数据
+            const repeatability = document.getElementById('result-repeatability').textContent;
+            const reproducibility = document.getElementById('result-reproducibility').textContent;
+            const grr = document.getElementById('result-grr').textContent;
+            const parts = document.getElementById('result-parts').textContent;
+
+            // 创建CSV内容
+            let csvContent = '指标,数值\n';
+            csvContent += `重复性(Repeatability),${repeatability}\n`;
+            csvContent += `再现性(Reproducibility),${reproducibility}\n`;
+            csvContent += `GR&R,${grr}\n`;
+            csvContent += `部件变化,${parts}\n`;
+
+            // 下载CSV文件
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'MSA分析结果.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>
