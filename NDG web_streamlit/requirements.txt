@@ -1,0 +1,10 @@
+# 核心依赖
+streamlit
+numpy
+matplotlib
+pandas
+openpyxl
+
+# 可选依赖
+plotly  # 用于更高级的图表
+seaborn  # 用于统计数据可视化
